@@ -5,11 +5,13 @@
 """
 Code for generating classes suitable for invoking dbus-python methods.
 """
+import types
+import dbus
 
 from ._errors import DPClientGenerationError
 
 
-def _prop_builder(spec):
+def prop_builder(spec):
     """
     Returns a function that builds a property interface based on 'spec'.
 
@@ -19,8 +21,8 @@ def _prop_builder(spec):
     :raises DPClientGenerationError:
     """
 
-    interface_name = spec.find("./[@name]")
-    if interface_name is None:
+    interface_name = spec.attrib.get('name')
+    if interface_name is None: # pragma: no cover
         raise DPClientGenerationError("No name found for interface.")
 
     def builder(namespace):
@@ -46,7 +48,7 @@ def _prop_builder(spec):
         :param namespace: the class's namespace
         """
 
-        def build_property_getter(name): # pragma: no cover
+        def build_property_getter(name):
             """
             Build a single property getter for this class.
 
@@ -65,7 +67,7 @@ def _prop_builder(spec):
 
             return dbus_func
 
-        def build_property_setter(name): # pragma: no cover
+        def build_property_setter(name):
             """
             Build a single property setter for this class.
 
@@ -86,12 +88,13 @@ def _prop_builder(spec):
             return dbus_func
 
         for prop in spec.findall('./property'):
-            name = prop.find('./[@name]')
-            if name is None:
+            name = prop.attrib.get('name')
+            # pylint: disable=cell-var-from-loop
+            if name is None: # pragma: no cover
                 raise DPClientGenerationError("No name found for property.")
 
-            access = prop.find('./[@access]')
-            if access is None:
+            access = prop.attrib.get('access')
+            if access is None: # pragma: no cover
                 raise DPClientGenerationError("No access found for property.")
 
             if access == "read":

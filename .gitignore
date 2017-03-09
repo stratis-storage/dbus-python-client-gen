@@ -1,1 +1,7 @@
 *.swp
+*.egg-info
+__pycache__
+.cache
+.coverage
+.tox
+htmlcov
