@@ -17,3 +17,9 @@ class DPClientGenerationError(Exception):
     Exception during generation of classes.
     """
     pass
+
+class DPClientRuntimeError(Exception):
+    """
+    Exception raised during execution of generated classes.
+    """
+    pass

@@ -8,7 +8,10 @@ Code for generating classes suitable for invoking dbus-python methods.
 import types
 import dbus
 
+from into_dbus_python import xformers
+
 from ._errors import DPClientGenerationError
+from ._errors import DPClientRuntimeError
 
 
 def prop_builder(spec):
@@ -27,8 +30,6 @@ def prop_builder(spec):
 
     def builder(namespace):
         """
-        The property class's namespace.
-
         Fills the namespace of the parent class with class members that are
         classes. Each class member has the name of a property, and each
         class has up to two static methods, a Get method if the property is
@@ -100,7 +101,7 @@ def prop_builder(spec):
             if access == "read":
                 getter = staticmethod(build_property_getter(name))
 
-                def method_builder(namespace):
+                def prop_method_builder(namespace):
                     """
                     Attaches appropriate methods to namespace.
                     """
@@ -109,7 +110,7 @@ def prop_builder(spec):
             elif access == "write":
                 setter = staticmethod(build_property_setter(name))
 
-                def method_builder(namespace):
+                def prop_method_builder(namespace):
                     """
                     Attaches appropriate methods to namespace.
                     """
@@ -118,7 +119,7 @@ def prop_builder(spec):
                 getter = staticmethod(build_property_getter(name))
                 setter = staticmethod(build_property_setter(name))
 
-                def method_builder(namespace):
+                def prop_method_builder(namespace):
                     """
                     Attaches appropriate methods to namespace.
                     """
@@ -129,7 +130,91 @@ def prop_builder(spec):
                types.new_class(
                   name,
                   bases=(object,),
-                  exec_body=method_builder
+                  exec_body=prop_method_builder
                )
+
+    return builder
+
+
+def method_builder(spec):
+    """
+    Returns a function that builds a method interface based on 'spec'.
+
+    :param spec: the interface specification
+    :type spec: xml.element.ElementTree.Element
+
+    :raises DPClientGenerationError:
+    """
+
+    interface_name = spec.attrib.get('name')
+    if interface_name is None: # pragma: no cover
+        raise DPClientGenerationError("No name found for interface.")
+
+    def builder(namespace):
+        """
+        Fills the namespace of the parent class with class members that are
+        methods. Each method takes a proxy object and a set of keyword
+        arguments.
+
+        For example, given the spec:
+
+        <method name="CreatePool">
+        <arg name="name" type="s" direction="in"/>
+        <arg name="redundancy" type="(bq)" direction="in"/>
+        <arg name="force" type="b" direction="in"/>
+        <arg name="devices" type="as" direction="in"/>
+        <arg name="result" type="(oas)" direction="out"/>
+        <arg name="return_code" type="q" direction="out"/>
+        <arg name="return_string" type="s" direction="out"/>
+        </method>
+
+        A method called "CreatePool" with four keyword arguments,
+        "name", "redundancy", "force", "devices", will be added to the
+        namespace.
+
+        :param namespace: the class's namespace
+        """
+
+        def build_method(spec):
+            """
+            Build a method for this class.
+
+            :param spec: the specification for a single method
+            :type spec: Element
+            """
+
+            name = spec.attrib.get("name")
+            if name is None: # pragma: no cover
+                raise DPClientGenerationError("No name found for method.")
+
+            inargs = spec.findall('./arg[@direction="in"]')
+            arg_names = [e.attrib["name"] for e in inargs]
+
+            signature = "".join(e.attrib["type"] for e in inargs)
+            func = xformers(signature)
+
+            def dbus_func(proxy_object, **kwargs): # pragma: no cover
+                """
+                The method proper.
+                """
+                if frozenset(arg_names) != frozenset(kwargs.keys()):
+                    raise DPClientRuntimeError("Key mismatch: %s != %s" %
+                       (", ".join(arg_names), ", ".join(kwargs.keys())))
+                args = \
+                   [v for (k, v) in \
+                   sorted(kwargs.items(), key=lambda x: arg_names.index(x[0]))]
+                xformed_args = func(args)
+                dbus_method = getattr(proxy_object, name)
+                return dbus_method(*xformed_args, dbus_interface=interface_name)
+
+            return dbus_func
+
+        for method in spec.findall('./method'):
+            name = method.attrib.get('name')
+            # pylint: disable=cell-var-from-loop
+            if name is None: # pragma: no cover
+                raise DPClientGenerationError("No name found for method.")
+
+            namespace[name] = staticmethod(build_method(method))
 
     return builder
