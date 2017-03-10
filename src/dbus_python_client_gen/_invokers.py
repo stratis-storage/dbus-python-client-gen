@@ -18,6 +18,21 @@ def prop_builder(spec):
     """
     Returns a function that builds a property interface based on 'spec'.
 
+    Usage example:
+
+    * spec is an xml specification for an interface in the format returned
+    by the Introspect() method.
+    * proxy_object is a dbus-python ProxyObject which implements
+    the interface defined by spec which has a Name property.
+
+    >>> builder = prop_builder(spec)
+    >>> Properties = types.new_class("Properties", bases=(object,), exec_body=builder)
+    >>> Properties.Name.Get(proxy_object)
+    >>> Properties.Name.Set(proxy_object, "name")
+
+    Note that both Get and Set are optional and depend on the properties of the
+    attribute.
+
     :param spec: the interface specification
     :type spec: xml.element.ElementTree.Element
 
@@ -50,12 +65,18 @@ def prop_builder(spec):
         :param namespace: the class's namespace
         """
 
-        def build_property_getter(name):
+        def build_property_getter(spec):
             """
             Build a single property getter for this class.
 
-            :param str name: the property name
+            :param spec: the specification for this property
             """
+
+            try:
+                name = spec.attrib['name']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No name found for property.") \
+                   from err
 
             def dbus_func(proxy_object): # pragma: no cover
                 """
@@ -69,12 +90,24 @@ def prop_builder(spec):
 
             return dbus_func
 
-        def build_property_setter(name):
+        def build_property_setter(spec):
             """
             Build a single property setter for this class.
 
-            :param str name: the property name
+            :param spec: the specification for a single property
             """
+            try:
+                name = spec.attrib['name']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No name found for property.") \
+                   from err
+
+            try:
+                signature = spec.attrib['type']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No type found for property.") \
+                   from err
+            xformer = xformers(signature)[0]
 
             def dbus_func(proxy_object, value): # pragma: no cover
                 """
@@ -83,7 +116,7 @@ def prop_builder(spec):
                 return proxy_object.Set(
                    interface_name,
                    name,
-                   value,
+                   xformer(value),
                    dbus_interface=dbus.PROPERTIES_IFACE
                 )
 
@@ -91,19 +124,13 @@ def prop_builder(spec):
 
         for prop in spec.findall('./property'):
             try:
-                name = prop.attrib['name']
-            except KeyError as err: # pragma: no cover
-                raise DPClientGenerationError("No name found for property.") \
-                   from err
-
-            try:
                 access = prop.attrib['access']
             except KeyError as err: # pragma: no cover
                 raise DPClientGenerationError("No access found for property.") \
                    from err
 
             if access == "read":
-                getter = build_property_getter(name)
+                getter = build_property_getter(prop)
 
                 def prop_method_builder(namespace):
                     """
@@ -113,7 +140,7 @@ def prop_builder(spec):
                     namespace['Get'] = staticmethod(getter)
 
             elif access == "write":
-                setter = build_property_setter(name)
+                setter = build_property_setter(prop)
 
                 def prop_method_builder(namespace):
                     """
@@ -122,8 +149,8 @@ def prop_builder(spec):
                     # pylint: disable=cell-var-from-loop
                     namespace['Set'] = staticmethod(setter)
             else:
-                getter = build_property_getter(name)
-                setter = build_property_setter(name)
+                getter = build_property_getter(prop)
+                setter = build_property_setter(prop)
 
                 def prop_method_builder(namespace):
                     """
@@ -132,6 +159,12 @@ def prop_builder(spec):
                     # pylint: disable=cell-var-from-loop
                     namespace['Get'] = staticmethod(getter)
                     namespace['Set'] = staticmethod(setter)
+
+            try:
+                name = prop.attrib['name']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No name found for property.") \
+                   from err
 
             namespace[name] = \
                types.new_class(
@@ -146,6 +179,17 @@ def prop_builder(spec):
 def method_builder(spec):
     """
     Returns a function that builds a method interface based on 'spec'.
+
+    Usage example:
+
+    * spec is an xml specification for an interface in the format returned
+    by the Introspect() method.
+    * proxy_object is a dbus-python ProxyObject which implements
+    the interface defined by spec which has a Name property.
+
+    >>> builder = method_builder(spec)
+    >>> Methods = types.new_class("Methods", bases=(object,), exec_body=builder)
+    >>> Methods.Method(proxy_object)
 
     :param spec: the interface specification
     :type spec: xml.element.ElementTree.Element
@@ -231,7 +275,7 @@ def method_builder(spec):
     return builder
 
 
-def invoker_builder(spec):
+def dbus_python_invoker_builder(spec):
     """
     Returns a function that builds a method interface based on 'spec'.
 
