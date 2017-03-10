@@ -42,7 +42,7 @@ def gmo_reader_builder(spec):
             :rtype: object
             """
 
-            def dbus_func(self): # pragma: no cover
+            def dbus_func(self):
                 """
                 The property getter.
                 """

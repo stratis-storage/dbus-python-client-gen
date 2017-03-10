@@ -6,4 +6,5 @@
 Top-level classes and methods.
 """
 
+from ._gmoreaders import gmo_reader_builder
 from ._invokers import invoker_builder

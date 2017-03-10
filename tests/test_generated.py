@@ -8,14 +8,18 @@ import unittest
 
 import xml.etree.ElementTree as ET
 
-from dbus_python_client_gen._invokers import invoker_builder
+from dbus_python_client_gen import gmo_reader_builder
+from dbus_python_client_gen import invoker_builder
+
+from dbus_python_client_gen._errors import DPClientRuntimeError
+
 from dbus_python_client_gen._invokers import method_builder
 from dbus_python_client_gen._invokers import prop_builder
 
 
-class PropertiesTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     """
-    Test that properties are appropriately generated.
+    Test the behavior of various auto-generated classes
     """
 
     _DIRNAME = os.path.dirname(__file__)
@@ -108,3 +112,18 @@ class PropertiesTestCase(unittest.TestCase):
         self._testProperties()
         self._testMethods()
         self._testKlass()
+
+
+    def testGMOReader(self):
+        """
+        Test that GMO reader from interface spec has the correct methods.
+        """
+        for name, spec in self._data.items():
+            builder = gmo_reader_builder(spec)
+            klass = types.new_class(name, bases=(object,), exec_body=builder)
+            reader = klass(dict())
+            for prop in spec.findall("./property"):
+                name = prop.attrib['name']
+                self.assertTrue(hasattr(klass, name))
+                with self.assertRaises(DPClientRuntimeError):
+                    getattr(reader, name)()
