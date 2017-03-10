@@ -24,9 +24,10 @@ def prop_builder(spec):
     :raises DPClientGenerationError:
     """
 
-    interface_name = spec.attrib.get('name')
-    if interface_name is None: # pragma: no cover
-        raise DPClientGenerationError("No name found for interface.")
+    try:
+        interface_name = spec.attrib['name']
+    except KeyError as err: # pragma: no cover
+        raise DPClientGenerationError("No name found for interface.") from err
 
     def builder(namespace):
         """
@@ -89,13 +90,17 @@ def prop_builder(spec):
             return dbus_func
 
         for prop in spec.findall('./property'):
-            name = prop.attrib.get('name')
-            if name is None: # pragma: no cover
-                raise DPClientGenerationError("No name found for property.")
+            try:
+                name = prop.attrib['name']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No name found for property.") \
+                   from err
 
-            access = prop.attrib.get('access')
-            if access is None: # pragma: no cover
-                raise DPClientGenerationError("No access found for property.")
+            try:
+                access = prop.attrib['access']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No access found for property.") \
+                   from err
 
             if access == "read":
                 getter = build_property_getter(name)
@@ -148,9 +153,10 @@ def method_builder(spec):
     :raises DPClientGenerationError:
     """
 
-    interface_name = spec.attrib.get('name')
-    if interface_name is None: # pragma: no cover
-        raise DPClientGenerationError("No name found for interface.")
+    try:
+        interface_name = spec.attrib['name']
+    except KeyError as err: # pragma: no cover
+        raise DPClientGenerationError("No name found for interface.") from err
 
     def builder(namespace):
         """
@@ -185,9 +191,11 @@ def method_builder(spec):
             :type spec: Element
             """
 
-            name = spec.attrib.get("name")
-            if name is None: # pragma: no cover
-                raise DPClientGenerationError("No name found for method.")
+            try:
+                name = spec.attrib["name"]
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No name found for method.") \
+                   from err
 
             inargs = spec.findall('./arg[@direction="in"]')
             arg_names = [e.attrib["name"] for e in inargs]
@@ -212,9 +220,11 @@ def method_builder(spec):
             return dbus_func
 
         for method in spec.findall('./method'):
-            name = method.attrib.get('name')
-            if name is None: # pragma: no cover
-                raise DPClientGenerationError("No name found for method.")
+            try:
+                name = method.attrib['name']
+            except KeyError as err: # pragma: no cover
+                raise DPClientGenerationError("No name found for method.") \
+                   from err
 
             namespace[name] = staticmethod(build_method(method))
 
@@ -230,10 +240,6 @@ def invoker_builder(spec):
 
     :raises DPClientGenerationError:
     """
-
-    interface_name = spec.attrib.get('name')
-    if interface_name is None: # pragma: no cover
-        raise DPClientGenerationError("No name found for interface.")
 
     def builder(namespace):
         """

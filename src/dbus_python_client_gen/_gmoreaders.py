@@ -21,9 +21,10 @@ def gmo_reader_builder(spec):
     :type spec: Element
     """
 
-    interface_name = spec.attrib.get('name')
-    if interface_name is None: # pragma: no cover
-        raise DPClientGenerationError("No name found for interface.")
+    try:
+        interface_name = spec.attrib['name']
+    except KeyError as err: # pragma: no cover
+        raise DPClientGenerationError("No name found for interface.") from err
 
     def builder(namespace):
         """
@@ -49,11 +50,11 @@ def gmo_reader_builder(spec):
                 # pylint: disable=protected-access
                 try:
                     return self._table[interface_name][name]
-                except KeyError:
+                except KeyError as err:
                     raise DPClientRuntimeError(
                        "No entry found for interface %s and property %s" %
                        (interface_name, name)
-                    )
+                    ) from err
 
             return dbus_func
 
