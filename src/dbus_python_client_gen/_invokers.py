@@ -221,7 +221,7 @@ def method_builder(spec):
     return builder
 
 
-def class_builder(spec):
+def invoker_builder(spec):
     """
     Returns a function that builds a method interface based on 'spec'.
 
