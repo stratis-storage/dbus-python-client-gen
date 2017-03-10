@@ -90,7 +90,6 @@ def prop_builder(spec):
 
         for prop in spec.findall('./property'):
             name = prop.attrib.get('name')
-            # pylint: disable=cell-var-from-loop
             if name is None: # pragma: no cover
                 raise DPClientGenerationError("No name found for property.")
 
@@ -99,32 +98,35 @@ def prop_builder(spec):
                 raise DPClientGenerationError("No access found for property.")
 
             if access == "read":
-                getter = staticmethod(build_property_getter(name))
+                getter = build_property_getter(name)
 
                 def prop_method_builder(namespace):
                     """
                     Attaches appropriate methods to namespace.
                     """
-                    namespace['Get'] = getter
+                    # pylint: disable=cell-var-from-loop
+                    namespace['Get'] = staticmethod(getter)
 
             elif access == "write":
-                setter = staticmethod(build_property_setter(name))
+                setter = build_property_setter(name)
 
                 def prop_method_builder(namespace):
                     """
                     Attaches appropriate methods to namespace.
                     """
-                    namespace['Set'] = setter
+                    # pylint: disable=cell-var-from-loop
+                    namespace['Set'] = staticmethod(setter)
             else:
-                getter = staticmethod(build_property_getter(name))
-                setter = staticmethod(build_property_setter(name))
+                getter = build_property_getter(name)
+                setter = build_property_setter(name)
 
                 def prop_method_builder(namespace):
                     """
                     Attaches appropriate methods to namespace.
                     """
-                    namespace['Get'] = getter
-                    namespace['Set'] = setter
+                    # pylint: disable=cell-var-from-loop
+                    namespace['Get'] = staticmethod(getter)
+                    namespace['Set'] = staticmethod(setter)
 
             namespace[name] = \
                types.new_class(
@@ -211,7 +213,6 @@ def method_builder(spec):
 
         for method in spec.findall('./method'):
             name = method.attrib.get('name')
-            # pylint: disable=cell-var-from-loop
             if name is None: # pragma: no cover
                 raise DPClientGenerationError("No name found for method.")
 
