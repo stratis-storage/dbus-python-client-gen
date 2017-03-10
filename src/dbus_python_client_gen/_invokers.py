@@ -218,3 +218,45 @@ def method_builder(spec):
             namespace[name] = staticmethod(build_method(method))
 
     return builder
+
+
+def class_builder(spec):
+    """
+    Returns a function that builds a method interface based on 'spec'.
+
+    :param spec: the interface specification
+    :type spec: xml.element.ElementTree.Element
+
+    :raises DPClientGenerationError:
+    """
+
+    interface_name = spec.attrib.get('name')
+    if interface_name is None: # pragma: no cover
+        raise DPClientGenerationError("No name found for interface.")
+
+    def builder(namespace):
+        """
+        Fills the namespace of the parent class with two class members,
+        Properties and Methods. Both of these are classes which themselves
+        contain static fields. Each static field in the Properties class
+        is a class corresponding to a property of the interface. Each static
+        field in the Methods class is a method corresponding to a method
+        on the interface.
+
+        :param namespace: the class's namespace
+        """
+        namespace["Methods"] = \
+           types.new_class(
+              "Methods",
+              bases=(object,),
+              exec_body=method_builder(spec)
+           )
+
+        namespace["Properties"] = \
+           types.new_class(
+              "Properties",
+              bases=(object,),
+              exec_body=prop_builder(spec)
+           )
+
+    return builder
