@@ -5,3 +5,5 @@
 """
 Top-level classes and methods.
 """
+
+from ._invokers import class_builder
