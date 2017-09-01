@@ -271,7 +271,11 @@ def method_builder(spec):
                     raise DPClientRuntimeError() from err
 
                 dbus_method = getattr(proxy_object, name)
-                return dbus_method(*xformed_args, dbus_interface=interface_name)
+
+                try:
+                    return dbus_method(*xformed_args, dbus_interface=interface_name)
+                except dbus.DBusException as err:
+                    raise DPClientRuntimeError() from err
 
             return dbus_func
 
