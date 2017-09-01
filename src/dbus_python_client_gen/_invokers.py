@@ -8,6 +8,7 @@ Code for generating classes suitable for invoking dbus-python methods.
 import types
 import dbus
 
+from into_dbus_python import IntoDPError
 from into_dbus_python import xformers
 
 from ._errors import DPClientGenerationError
@@ -250,6 +251,8 @@ def method_builder(spec):
             def dbus_func(proxy_object, **kwargs): # pragma: no cover
                 """
                 The method proper.
+
+                :raises DPClientRuntimeError:
                 """
                 if frozenset(arg_names) != frozenset(kwargs.keys()):
                     raise DPClientRuntimeError("Key mismatch: %s != %s" %
@@ -257,7 +260,12 @@ def method_builder(spec):
                 args = \
                    [v for (k, v) in \
                    sorted(kwargs.items(), key=lambda x: arg_names.index(x[0]))]
-                xformed_args = func(args)
+
+                try:
+                    xformed_args = func(args)
+                except IntoDPError as err:
+                    raise DPClientRuntimeError() from err
+
                 dbus_method = getattr(proxy_object, name)
                 return dbus_method(*xformed_args, dbus_interface=interface_name)
 
