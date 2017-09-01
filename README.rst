@@ -3,12 +3,10 @@ A Python Library for Generating dbus-python Client Code
 
 Function
 --------
-This library contains a function, invoker_builder, that consumes
-an XML specification of a D-Bus interface and yields a function suitable
-for use in a new_class method invocation. ::
+This library contains a function, make_class, that consumes
+an XML specification of a D-Bus interface. ::
 
->>> builder = invoker_builder(spec)
->>> Klass = types.new_class("Klass", bases=(object,), exec_body=builder)
+>>> Klass = make_class("Klass", spec)
 
 This call yields a Python class, called Klass, with two static class
 members, "Methods" and "Properties". The "Methods" class has a static
@@ -49,14 +47,6 @@ or with an incorrect keyword as, ::
 or without all the necessary keywords as, ::
 
 >>> Klass.Methods.Create(proxy)
-
-For the simplest situations, this library defines a convenience function,
-make_class. ::
-
->>> Klass = make_class("Klass", spec) 
-
-is equivalent to the longer form which builds the function and invokes
-types.new_class.
 
 Errors
 ------
