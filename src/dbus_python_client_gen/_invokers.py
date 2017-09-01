@@ -327,3 +327,16 @@ def invoker_builder(spec):
            )
 
     return builder
+
+def make_class(name, spec):
+    """
+    Make a class, name, from the given spec.
+    The class defines static properties and methods according to the spec.
+
+    :param str name: the name of the class.
+    :param spec: the interface specification
+    :type spec: xml.element.ElementTree.Element
+    :returns: the constructed class
+    :rtype: type
+    """
+    return types.new_class(name, bases=(object,), exec_body=invoker_builder(spec))

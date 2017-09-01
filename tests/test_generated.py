@@ -8,7 +8,7 @@ import unittest
 
 import xml.etree.ElementTree as ET
 
-from dbus_python_client_gen import invoker_builder
+from dbus_python_client_gen import make_class
 
 from dbus_python_client_gen._invokers import method_builder
 from dbus_python_client_gen._invokers import prop_builder
@@ -91,8 +91,7 @@ class TestCase(unittest.TestCase):
         fields, "Properties" and "Methods".
         """
         for name, spec in self._data.items():
-            builder = invoker_builder(spec)
-            klass = types.new_class(name, bases=(object,), exec_body=builder)
+            klass = make_class(name, spec)
             self.assertTrue(hasattr(klass, "Properties"))
             properties = getattr(klass, "Properties")
             self.assertTrue(hasattr(klass, "Methods"))

@@ -50,6 +50,14 @@ or without all the necessary keywords as, ::
 
 >>> Klass.Methods.Create(proxy)
 
+For the simplest situations, this library defines a convenience function,
+make_class. ::
+
+>>> Klass = make_class("Klass", spec) 
+
+is equivalent to the longer form which builds the function and invokes
+types.new_class.
+
 Errors
 ------
 This library exports one exception type, DPClientError. It constitutes a bug
