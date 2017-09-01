@@ -246,6 +246,10 @@ def method_builder(spec):
             arg_names = [e.attrib["name"] for e in inargs]
 
             signature = "".join(e.attrib["type"] for e in inargs)
+
+            # This function is expected to work for all legal signatures,
+            # and the attributes are expected to contain only legal signatures.
+            # Thus, it should never fail.
             func = xformers(signature)
 
             def dbus_func(proxy_object, **kwargs): # pragma: no cover
