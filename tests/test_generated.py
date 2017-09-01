@@ -8,11 +8,7 @@ import unittest
 
 import xml.etree.ElementTree as ET
 
-from dbus_python_client_gen import gmo_query_builder
-from dbus_python_client_gen import gmo_reader_builder
 from dbus_python_client_gen import dbus_python_invoker_builder
-
-from dbus_python_client_gen._errors import DPClientRuntimeError
 
 from dbus_python_client_gen._invokers import method_builder
 from dbus_python_client_gen._invokers import prop_builder
@@ -114,55 +110,3 @@ class TestCase(unittest.TestCase):
         self._testProperties()
         self._testMethods()
         self._testKlass()
-
-
-    def testGMOReader(self):
-        """
-        Test that GMO reader from interface spec has the correct methods.
-
-        Verify that empty table for an object always raises an exception.
-        """
-        for name, spec in self._data.items():
-            builder = gmo_reader_builder(spec)
-            klass = types.new_class(name, bases=(object,), exec_body=builder)
-            for prop in spec.findall("./property"):
-                name = prop.attrib['name']
-                self.assertTrue(hasattr(klass, name))
-                table = {spec.attrib['name']: {name: "tank"}}
-                obj = klass(table)
-                self.assertTrue(hasattr(obj, name))
-                self.assertEqual(getattr(obj, name)(), "tank")
-            with self.assertRaises(DPClientRuntimeError):
-                klass(dict())
-
-    def testGMOQuery(self):
-        """
-        Test that gmo query builder returns a thing for an interface.
-        """
-        for spec in self._data.values():
-            query = gmo_query_builder(spec)
-
-            with self.assertRaises(DPClientRuntimeError):
-                list(query(dict(), {"bogus": None}))
-
-            properties = [p.attrib['name'] for p in spec.findall("./property")]
-            name = spec.attrib['name']
-            table = {
-               'junk': {name: dict((k, None) for k in properties)},
-               'other': {"interface": dict()},
-               'nomatch': {name: dict((k, 2) for k in properties)},
-            }
-
-            if len(properties) != 0:
-                self.assertEqual(
-                   len(list(query(table, dict((k, None) for k in properties)))),
-                   1
-                )
-                with self.assertRaises(DPClientRuntimeError):
-                    table = {"junk": {name: dict()}}
-                    list(query(table, dict((k, None) for k in properties)))
-            else:
-                self.assertEqual(
-                   len(list(query(table, dict((k, None) for k in properties)))),
-                   2
-                )
