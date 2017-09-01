@@ -6,6 +6,4 @@
 Top-level classes and methods.
 """
 
-from ._gmoreaders import gmo_reader_builder
 from ._invokers import dbus_python_invoker_builder
-from ._managed_objects_readers import gmo_query_builder
