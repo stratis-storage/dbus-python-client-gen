@@ -291,7 +291,7 @@ def method_builder(spec):
     return builder
 
 
-def dbus_python_invoker_builder(spec):
+def invoker_builder(spec):
     """
     Returns a function that builds a method interface based on 'spec'.
 
