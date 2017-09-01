@@ -1,23 +1,66 @@
 A Python Library for Generating dbus-python Client Code
 =======================================================
 
-Introduction
+Function
+--------
+This library contains a function, invoker_builder, that consumes
+an XML specification of a D-Bus interface and yields a function suitable
+for use in a new_class method invocation. ::
+
+>>> builder = invoker_builder(spec)
+>>> Klass = types.new_class("Klass", bases=(object,), exec_body=builder)
+
+This call yields a Python class, called Klass, with two static class
+members, "Methods" and "Properties". The "Methods" class has a static
+method corresponding to each method defined in the interface. Each method
+takes a proxy object as its first argument followed by any number of
+keyword arguments, corresponding to the arguments of the method. The
+"Properties" class has a static class corresponding to every property
+defined in the interface. Each property class may have a static Get() or
+Set() method, depending on its attributes.
+
+For example, assuming the interface defines a read only Version property,
+the following call should return a value. ::
+
+>>> Klass.Properties.Version.Get()
+
+However, since Version is a read only property, the following call should
+fail with an AttributeError. ::
+
+>>> Klass.Properties.Version.Set("42")
+
+Similarly, if the interface defines a method, Create, with one argument,
+name, a STRING, the following call should succeed. ::
+
+>>> Klass.Methods.Create(proxy, name="name")
+
+The Create method invokes the method on the proxy object, passing force,
+transformed into a dbus-python String type.
+
+On the other hand, the invocation will raise a DPClientError exception if
+the method is called with an argument with an incorrect type as, ::
+
+>>> Klass.Methods.Create(proxy, name=false)
+
+or with an incorrect keyword as, ::
+
+>>> Klass.Methods.Create(proxy, force=false)
+
+or without all the necessary keywords as, ::
+
+>>> Klass.Methods.Create(proxy)
+
+Errors
+------
+This library exports one exception type, DPClientError. It constitutes a bug
+if an error of any other type is propagated during class generation or when
+the methods of the class are executed.
+
+Dependencies
 ------------
-This library contains a method that consumes an XML specification of
-a D-Bus interface and yields a Pythonic interface for invoking methods and
-obtaining properties on that interface using the dbus-python library.
+* dbus-python
+* into-dbus-python
 
-Methods
--------
-
-* dbus_python_invoker_builder:
-  This functions consumes the spec for a single interface and returns a class
-  that contains dbus-python dependent code to invoke methods on D-Bus objects.
-  The client chooses the class name. Each generated class contains two static
-  class members, "Methods" and "Properties". The "Methods" class has a number
-  of static methods corresponding to every method defined in the interface.
-  Each method takes a proxy object as its first argument followed by any
-  number of keyword arguments, corresponding to the arguments of the method.
-  The "Properties" class has a number of static classes corresponding to every
-  property defined in the interface. Each property class has a static Get() or
-  Set() method.
+Requirements
+------------
+This library is not compatible with Python 2.

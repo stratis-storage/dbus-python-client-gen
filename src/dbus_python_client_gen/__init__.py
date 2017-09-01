@@ -6,4 +6,4 @@
 Top-level classes and methods.
 """
 
-from ._invokers import dbus_python_invoker_builder
+from ._invokers import invoker_builder
