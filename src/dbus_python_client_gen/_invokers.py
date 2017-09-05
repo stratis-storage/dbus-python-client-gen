@@ -83,11 +83,14 @@ def prop_builder(spec):
                 """
                 The property getter.
                 """
-                return proxy_object.Get(
-                   interface_name,
-                   name,
-                   dbus_interface=dbus.PROPERTIES_IFACE
-                )
+                try:
+                    return proxy_object.Get(
+                       interface_name,
+                       name,
+                       dbus_interface=dbus.PROPERTIES_IFACE
+                    )
+                except dbus.DBusException as err:
+                    raise DPClientRuntimeError() from err
 
             return dbus_func
 
@@ -114,12 +117,15 @@ def prop_builder(spec):
                 """
                 The property setter.
                 """
-                return proxy_object.Set(
-                   interface_name,
-                   name,
-                   xformer(value),
-                   dbus_interface=dbus.PROPERTIES_IFACE
-                )
+                try:
+                    return proxy_object.Set(
+                       interface_name,
+                       name,
+                       xformer(value),
+                       dbus_interface=dbus.PROPERTIES_IFACE
+                    )
+                except dbus.DBusException as err:
+                    raise DPClientRuntimeError() from err
 
             return dbus_func
 
@@ -247,10 +253,10 @@ def method_builder(spec):
 
             signature = "".join(e.attrib["type"] for e in inargs)
 
-            # This function is expected to work for all legal signatures,
-            # and the attributes are expected to contain only legal signatures.
-            # Thus, it should never fail.
-            func = xformers(signature)
+            try:
+                func = xformers(signature)
+            except IntoDPError as err: #pragma: no cover
+                raise DPClientGenerationError() from err
 
             def dbus_func(proxy_object, **kwargs): # pragma: no cover
                 """
@@ -327,3 +333,16 @@ def invoker_builder(spec):
            )
 
     return builder
+
+def make_class(name, spec):
+    """
+    Make a class, name, from the given spec.
+    The class defines static properties and methods according to the spec.
+
+    :param str name: the name of the class.
+    :param spec: the interface specification
+    :type spec: xml.element.ElementTree.Element
+    :returns: the constructed class
+    :rtype: type
+    """
+    return types.new_class(name, bases=(object,), exec_body=invoker_builder(spec))

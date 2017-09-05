@@ -6,4 +6,4 @@
 Top-level classes and methods.
 """
 
-from ._invokers import invoker_builder
+from ._invokers import make_class
