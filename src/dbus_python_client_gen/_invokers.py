@@ -247,10 +247,10 @@ def method_builder(spec):
 
             signature = "".join(e.attrib["type"] for e in inargs)
 
-            # This function is expected to work for all legal signatures,
-            # and the attributes are expected to contain only legal signatures.
-            # Thus, it should never fail.
-            func = xformers(signature)
+            try:
+                func = xformers(signature)
+            except IntoDPError as err: #pragma: no cover
+                raise DPClientGenerationError() from err
 
             def dbus_func(proxy_object, **kwargs): # pragma: no cover
                 """
