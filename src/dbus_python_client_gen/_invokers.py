@@ -83,11 +83,14 @@ def prop_builder(spec):
                 """
                 The property getter.
                 """
-                return proxy_object.Get(
-                   interface_name,
-                   name,
-                   dbus_interface=dbus.PROPERTIES_IFACE
-                )
+                try:
+                    return proxy_object.Get(
+                       interface_name,
+                       name,
+                       dbus_interface=dbus.PROPERTIES_IFACE
+                    )
+                except dbus.DBusException as err:
+                    raise DPClientRuntimeError() from err
 
             return dbus_func
 
@@ -114,12 +117,15 @@ def prop_builder(spec):
                 """
                 The property setter.
                 """
-                return proxy_object.Set(
-                   interface_name,
-                   name,
-                   xformer(value),
-                   dbus_interface=dbus.PROPERTIES_IFACE
-                )
+                try:
+                    return proxy_object.Set(
+                       interface_name,
+                       name,
+                       xformer(value),
+                       dbus_interface=dbus.PROPERTIES_IFACE
+                    )
+                except dbus.DBusException as err:
+                    raise DPClientRuntimeError() from err
 
             return dbus_func
 
