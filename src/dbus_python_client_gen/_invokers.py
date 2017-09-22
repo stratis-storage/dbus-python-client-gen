@@ -9,6 +9,7 @@ import types
 import dbus
 
 from into_dbus_python import IntoDPError
+from into_dbus_python import xformer
 from into_dbus_python import xformers
 
 from ._errors import DPClientGenerationError
@@ -111,7 +112,7 @@ def prop_builder(spec):
             except KeyError as err: # pragma: no cover
                 raise DPClientGenerationError("No type found for property.") \
                    from err
-            xformer = xformers(signature)[0]
+            func = xformers(signature)[0]
 
             def dbus_func(proxy_object, value): # pragma: no cover
                 """
@@ -121,7 +122,7 @@ def prop_builder(spec):
                     return proxy_object.Set(
                        interface_name,
                        name,
-                       xformer(value),
+                       func(value),
                        dbus_interface=dbus.PROPERTIES_IFACE
                     )
                 except dbus.DBusException as err:
@@ -255,7 +256,7 @@ def method_builder(spec):
             signature = "".join(e.attrib["type"] for e in inargs)
 
             try:
-                func = xformers(signature)
+                func = xformer(signature)
             except IntoDPError as err: #pragma: no cover
                 raise DPClientGenerationError() from err
 
