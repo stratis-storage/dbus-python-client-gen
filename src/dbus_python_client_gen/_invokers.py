@@ -250,6 +250,7 @@ def method_builder(spec):
 
             inargs = spec.findall('./arg[@direction="in"]')
             arg_names = [e.attrib["name"] for e in inargs]
+            arg_names_set = frozenset(arg_names)
 
             signature = "".join(e.attrib["type"] for e in inargs)
 
@@ -264,7 +265,7 @@ def method_builder(spec):
 
                 :raises DPClientRuntimeError:
                 """
-                if frozenset(arg_names) != frozenset(kwargs.keys()):
+                if arg_names_set != frozenset(kwargs.keys()):
                     raise DPClientRuntimeError("Key mismatch: %s != %s" %
                        (", ".join(arg_names), ", ".join(kwargs.keys())))
                 args = \
