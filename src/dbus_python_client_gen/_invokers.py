@@ -260,18 +260,20 @@ def method_builder(spec):
             except IntoDPError as err: #pragma: no cover
                 raise DPClientGenerationError() from err
 
-            def dbus_func(proxy_object, **kwargs): # pragma: no cover
+            def dbus_func(proxy_object, func_args): # pragma: no cover
                 """
                 The method proper.
 
+                :param func_args: The function arguments
+                :type func_args: dict
                 :raises DPClientRuntimeError:
                 """
-                if arg_names_set != frozenset(kwargs.keys()):
+                if arg_names_set != frozenset(func_args.keys()):
                     raise DPClientRuntimeError("Key mismatch: %s != %s" %
-                       (", ".join(arg_names), ", ".join(kwargs.keys())))
+                       (", ".join(arg_names), ", ".join(func_args.keys())))
                 args = \
                    [v for (k, v) in \
-                   sorted(kwargs.items(), key=lambda x: arg_names.index(x[0]))]
+                   sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
 
                 try:
                     xformed_args = func(args)
