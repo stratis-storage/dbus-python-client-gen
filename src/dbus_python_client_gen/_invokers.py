@@ -278,10 +278,13 @@ def method_builder(spec):
                 except IntoDPError as err:
                     raise DPClientRuntimeError() from err
 
-                dbus_method = getattr(proxy_object, name)
+                dbus_method = proxy_object.get_dbus_method(
+                   name,
+                   dbus_interface=interface_name
+                )
 
                 try:
-                    return dbus_method(*xformed_args, dbus_interface=interface_name)
+                    return dbus_method(*xformed_args)
                 except dbus.DBusException as err:
                     raise DPClientRuntimeError() from err
 
