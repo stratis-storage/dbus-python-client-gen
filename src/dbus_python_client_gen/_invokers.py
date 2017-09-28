@@ -260,28 +260,33 @@ def method_builder(spec):
             except IntoDPError as err: #pragma: no cover
                 raise DPClientGenerationError() from err
 
-            def dbus_func(proxy_object, **kwargs): # pragma: no cover
+            def dbus_func(proxy_object, func_args): # pragma: no cover
                 """
                 The method proper.
 
+                :param func_args: The function arguments
+                :type func_args: dict
                 :raises DPClientRuntimeError:
                 """
-                if arg_names_set != frozenset(kwargs.keys()):
+                if arg_names_set != frozenset(func_args.keys()):
                     raise DPClientRuntimeError("Key mismatch: %s != %s" %
-                       (", ".join(arg_names), ", ".join(kwargs.keys())))
+                       (", ".join(arg_names), ", ".join(func_args.keys())))
                 args = \
                    [v for (k, v) in \
-                   sorted(kwargs.items(), key=lambda x: arg_names.index(x[0]))]
+                   sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
 
                 try:
                     xformed_args = func(args)
                 except IntoDPError as err:
                     raise DPClientRuntimeError() from err
 
-                dbus_method = getattr(proxy_object, name)
+                dbus_method = proxy_object.get_dbus_method(
+                   name,
+                   dbus_interface=interface_name
+                )
 
                 try:
-                    return dbus_method(*xformed_args, dbus_interface=interface_name)
+                    return dbus_method(*xformed_args)
                 except dbus.DBusException as err:
                     raise DPClientRuntimeError() from err
 
