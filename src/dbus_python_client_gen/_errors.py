@@ -12,14 +12,26 @@ class DPClientError(Exception):
     """
     pass
 
-class DPClientGenerationError(Exception):
+class DPClientGenerationError(DPClientError):
     """
     Exception during generation of classes.
     """
     pass
 
-class DPClientRuntimeError(Exception):
+class DPClientRuntimeError(DPClientError):
     """
     Exception raised during execution of generated classes.
+    """
+    pass
+
+class DPClientInvocationError(DPClientRuntimeError):
+    """
+    Exception raised when dbus-python method call fails.
+    """
+    pass
+
+class DPClientInvalidArgError(DPClientRuntimeError):
+    """
+    Exception raised when an invalid argument is passed to a generated method.
     """
     pass
