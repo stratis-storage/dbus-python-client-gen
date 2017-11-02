@@ -13,7 +13,8 @@ from into_dbus_python import xformer
 from into_dbus_python import xformers
 
 from ._errors import DPClientGenerationError
-from ._errors import DPClientRuntimeError
+from ._errors import DPClientInvalidArgError
+from ._errors import DPClientInvocationError
 
 
 def prop_builder(spec):
@@ -83,6 +84,8 @@ def prop_builder(spec):
             def dbus_func(proxy_object): # pragma: no cover
                 """
                 The property getter.
+
+                :raises DPClientInvocationError:
                 """
                 try:
                     return proxy_object.Get(
@@ -91,7 +94,7 @@ def prop_builder(spec):
                        dbus_interface=dbus.PROPERTIES_IFACE
                     )
                 except dbus.DBusException as err:
-                    raise DPClientRuntimeError() from err
+                    raise DPClientInvocationError() from err
 
             return dbus_func
 
@@ -112,11 +115,17 @@ def prop_builder(spec):
             except KeyError as err: # pragma: no cover
                 raise DPClientGenerationError("No type found for property.") \
                    from err
-            func = xformers(signature)[0]
+
+            try:
+                func = xformers(signature)[0]
+            except IntoDPError as err: #pragma: no cover
+                raise DPClientGenerationError() from err
 
             def dbus_func(proxy_object, value): # pragma: no cover
                 """
                 The property setter.
+
+                :raises DPClientRuntimeError:
                 """
                 try:
                     return proxy_object.Set(
@@ -126,7 +135,9 @@ def prop_builder(spec):
                        dbus_interface=dbus.PROPERTIES_IFACE
                     )
                 except dbus.DBusException as err:
-                    raise DPClientRuntimeError() from err
+                    raise DPClientInvocationError() from err
+                except IntoDPError as err:
+                    raise DPClientInvalidArgError() from err
 
             return dbus_func
 
@@ -269,7 +280,7 @@ def method_builder(spec):
                 :raises DPClientRuntimeError:
                 """
                 if arg_names_set != frozenset(func_args.keys()):
-                    raise DPClientRuntimeError("Key mismatch: %s != %s" %
+                    raise DPClientInvalidArgError("Key mismatch: %s != %s" %
                        (", ".join(arg_names), ", ".join(func_args.keys())))
                 args = \
                    [v for (k, v) in \
@@ -278,7 +289,7 @@ def method_builder(spec):
                 try:
                     xformed_args = func(args)
                 except IntoDPError as err:
-                    raise DPClientRuntimeError() from err
+                    raise DPClientInvalidArgError() from err
 
                 dbus_method = proxy_object.get_dbus_method(
                    name,
@@ -288,7 +299,7 @@ def method_builder(spec):
                 try:
                     return dbus_method(*xformed_args)
                 except dbus.DBusException as err:
-                    raise DPClientRuntimeError() from err
+                    raise DPClientInvocationError() from err
 
             return dbus_func
 
