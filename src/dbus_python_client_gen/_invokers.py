@@ -343,6 +343,9 @@ def invoker_builder(spec, timeout):
     :raises DPClientGenerationError:
     """
 
+    method_builder_arg = method_builder(spec, timeout)
+    prop_builder_arg = prop_builder(spec, timeout)
+
     def builder(namespace):
         """
         Fills the namespace of the parent class with two class members,
@@ -358,14 +361,14 @@ def invoker_builder(spec, timeout):
            types.new_class(
                "Methods",
                bases=(object,),
-               exec_body=method_builder(spec, timeout)
+               exec_body=method_builder_arg
            )
 
         namespace["Properties"] = \
            types.new_class(
                "Properties",
                bases=(object,),
-               exec_body=prop_builder(spec, timeout)
+               exec_body=prop_builder_arg
            )
 
     return builder
