@@ -17,7 +17,7 @@ from ._errors import DPClientInvalidArgError
 from ._errors import DPClientInvocationError
 
 
-def prop_builder(spec):
+def prop_builder(spec, timeout):
     """
     Returns a function that builds a property interface based on 'spec'.
 
@@ -28,7 +28,7 @@ def prop_builder(spec):
     * proxy_object is a dbus-python ProxyObject which implements
     the interface defined by spec which has a Name property.
 
-    >>> builder = prop_builder(spec)
+    >>> builder = prop_builder(spec, -1)
     >>> Properties = types.new_class("Properties", bases=(object,), exec_body=builder)
     >>> Properties.Name.Get(proxy_object)
     >>> Properties.Name.Set(proxy_object, "name")
@@ -37,6 +37,7 @@ def prop_builder(spec):
     attribute.
 
     :param spec: the interface specification
+    :param timeout: the dbus method timeout, -1 is the libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
 
     :raises DPClientGenerationError:
@@ -91,7 +92,8 @@ def prop_builder(spec):
                     return proxy_object.Get(
                        interface_name,
                        name,
-                       dbus_interface=dbus.PROPERTIES_IFACE
+                       dbus_interface=dbus.PROPERTIES_IFACE,
+                       timeout=timeout
                     )
                 except dbus.DBusException as err:
                     raise DPClientInvocationError() from err
@@ -132,7 +134,8 @@ def prop_builder(spec):
                        interface_name,
                        name,
                        func(value),
-                       dbus_interface=dbus.PROPERTIES_IFACE
+                       dbus_interface=dbus.PROPERTIES_IFACE,
+                       timeout=timeout
                     )
                 except dbus.DBusException as err:
                     raise DPClientInvocationError() from err
@@ -195,7 +198,7 @@ def prop_builder(spec):
     return builder
 
 
-def method_builder(spec):
+def method_builder(spec, timeout):
     """
     Returns a function that builds a method interface based on 'spec'.
 
@@ -206,11 +209,12 @@ def method_builder(spec):
     * proxy_object is a dbus-python ProxyObject which implements
     the interface defined by spec which has a Name property.
 
-    >>> builder = method_builder(spec)
+    >>> builder = method_builder(spec, -1)
     >>> Methods = types.new_class("Methods", bases=(object,), exec_body=builder)
     >>> Methods.Method(proxy_object)
 
     :param spec: the interface specification
+    :param timeout: the dbus method timeout, -1 is the libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
 
     :raises DPClientGenerationError:
@@ -297,7 +301,7 @@ def method_builder(spec):
                 )
 
                 try:
-                    return dbus_method(*xformed_args)
+                    return dbus_method(*xformed_args, timeout=timeout)
                 except dbus.DBusException as err:
                     raise DPClientInvocationError() from err
 
@@ -315,11 +319,12 @@ def method_builder(spec):
     return builder
 
 
-def invoker_builder(spec):
+def invoker_builder(spec, timeout):
     """
     Returns a function that builds a method interface based on 'spec'.
 
     :param spec: the interface specification
+    :param timeout: Timeout for dbus client, -1 == libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
 
     :raises DPClientGenerationError:
@@ -340,27 +345,29 @@ def invoker_builder(spec):
            types.new_class(
               "Methods",
               bases=(object,),
-              exec_body=method_builder(spec)
+              exec_body=method_builder(spec, timeout)
            )
 
         namespace["Properties"] = \
            types.new_class(
               "Properties",
               bases=(object,),
-              exec_body=prop_builder(spec)
+              exec_body=prop_builder(spec, timeout)
            )
 
     return builder
 
-def make_class(name, spec):
+
+def make_class(name, spec, timeout=-1):
     """
     Make a class, name, from the given spec.
     The class defines static properties and methods according to the spec.
 
     :param str name: the name of the class.
     :param spec: the interface specification
+    :param timeout: dbus timeout for method(s), -1 is the libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
     :returns: the constructed class
     :rtype: type
     """
-    return types.new_class(name, bases=(object,), exec_body=invoker_builder(spec))
+    return types.new_class(name, bases=(object,), exec_body=invoker_builder(spec, timeout))
