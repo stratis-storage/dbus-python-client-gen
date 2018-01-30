@@ -37,8 +37,8 @@ def prop_builder(spec, timeout):
     attribute.
 
     :param spec: the interface specification
-    :param timeout: the dbus method timeout, -1 is the libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
+    :param int timeout: the dbus method timeout, -1 is the libdbus default ~25s.
 
     :raises DPClientGenerationError:
     """
@@ -214,8 +214,8 @@ def method_builder(spec, timeout):
     >>> Methods.Method(proxy_object)
 
     :param spec: the interface specification
-    :param timeout: the dbus method timeout, -1 is the libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
+    :param int timeout: the dbus method timeout, -1 is the libdbus default ~25s.
 
     :raises DPClientGenerationError:
     """
@@ -324,8 +324,8 @@ def invoker_builder(spec, timeout):
     Returns a function that builds a method interface based on 'spec'.
 
     :param spec: the interface specification
-    :param timeout: Timeout for dbus client, -1 == libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
+    :param int timeout: Timeout for dbus client, -1 == libdbus default ~25s.
 
     :raises DPClientGenerationError:
     """
@@ -365,8 +365,8 @@ def make_class(name, spec, timeout=-1):
 
     :param str name: the name of the class.
     :param spec: the interface specification
-    :param timeout: dbus timeout for method(s), -1 is the libdbus default ~25s.
     :type spec: xml.element.ElementTree.Element
+    :param int timeout: dbus timeout for method(s), -1 is libdbus default ~25s.
     :returns: the constructed class
     :rtype: type
     """
