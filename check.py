@@ -6,13 +6,11 @@ import sys
 
 arg_map = {
     "src/dbus_python_client_gen": [
-        "--reports=no", "--disable=I", "--disable=duplicate-code",
-        "--disable=invalid-name",
+        "--reports=no", "--disable=I", "--disable=invalid-name",
         "--msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'"
     ],
     "tests": [
-        "--reports=no", "--disable=I", "--disable=duplicate-code",
-        "--disable=invalid-name",
+        "--reports=no", "--disable=I", "--disable=invalid-name",
         "--msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'"
     ]
 }
