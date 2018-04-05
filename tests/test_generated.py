@@ -14,7 +14,6 @@ from dbus_python_client_gen._invokers import method_builder
 from dbus_python_client_gen._invokers import prop_builder
 
 
-
 class TestCase(unittest.TestCase):
     """
     Test the behavior of various auto-generated classes
@@ -59,7 +58,7 @@ class TestCase(unittest.TestCase):
         """
         for name, spec in self._data.items():
             builder = prop_builder(spec, -1)
-            klass = types.new_class(name, bases=(object,), exec_body=builder)
+            klass = types.new_class(name, bases=(object, ), exec_body=builder)
             for prop in spec.findall("./property"):
                 self._test_property(klass, prop)
 
@@ -81,7 +80,7 @@ class TestCase(unittest.TestCase):
         """
         for name, spec in self._data.items():
             builder = method_builder(spec, -1)
-            klass = types.new_class(name, bases=(object,), exec_body=builder)
+            klass = types.new_class(name, bases=(object, ), exec_body=builder)
             for method in spec.findall("./method"):
                 self._test_method(klass, method)
 

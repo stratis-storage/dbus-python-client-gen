@@ -1,7 +1,6 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 """
 Code for generating classes suitable for invoking dbus-python methods.
 """
@@ -45,7 +44,7 @@ def prop_builder(spec, timeout):
 
     try:
         interface_name = spec.attrib['name']
-    except KeyError as err: # pragma: no cover
+    except KeyError as err:  # pragma: no cover
         raise DPClientGenerationError("No name found for interface.") from err
 
     def builder(namespace):
@@ -78,11 +77,11 @@ def prop_builder(spec, timeout):
 
             try:
                 name = spec.attrib['name']
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No name found for property.") \
                    from err
 
-            def dbus_func(proxy_object): # pragma: no cover
+            def dbus_func(proxy_object):  # pragma: no cover
                 """
                 The property getter.
 
@@ -90,11 +89,10 @@ def prop_builder(spec, timeout):
                 """
                 try:
                     return proxy_object.Get(
-                       interface_name,
-                       name,
-                       dbus_interface=dbus.PROPERTIES_IFACE,
-                       timeout=timeout
-                    )
+                        interface_name,
+                        name,
+                        dbus_interface=dbus.PROPERTIES_IFACE,
+                        timeout=timeout)
                 except dbus.DBusException as err:
                     raise DPClientInvocationError() from err
 
@@ -108,22 +106,22 @@ def prop_builder(spec, timeout):
             """
             try:
                 name = spec.attrib['name']
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No name found for property.") \
                    from err
 
             try:
                 signature = spec.attrib['type']
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No type found for property.") \
                    from err
 
             try:
                 func = xformers(signature)[0]
-            except IntoDPError as err: #pragma: no cover
+            except IntoDPError as err:  #pragma: no cover
                 raise DPClientGenerationError() from err
 
-            def dbus_func(proxy_object, value): # pragma: no cover
+            def dbus_func(proxy_object, value):  # pragma: no cover
                 """
                 The property setter.
 
@@ -131,12 +129,11 @@ def prop_builder(spec, timeout):
                 """
                 try:
                     return proxy_object.Set(
-                       interface_name,
-                       name,
-                       func(value),
-                       dbus_interface=dbus.PROPERTIES_IFACE,
-                       timeout=timeout
-                    )
+                        interface_name,
+                        name,
+                        func(value),
+                        dbus_interface=dbus.PROPERTIES_IFACE,
+                        timeout=timeout)
                 except dbus.DBusException as err:
                     raise DPClientInvocationError() from err
                 except IntoDPError as err:
@@ -147,7 +144,7 @@ def prop_builder(spec, timeout):
         for prop in spec.findall('./property'):
             try:
                 access = prop.attrib['access']
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No access found for property.") \
                    from err
 
@@ -184,15 +181,15 @@ def prop_builder(spec, timeout):
 
             try:
                 name = prop.attrib['name']
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No name found for property.") \
                    from err
 
             namespace[name] = \
                types.new_class(
-                  name,
-                  bases=(object,),
-                  exec_body=prop_method_builder
+                   name,
+                   bases=(object,),
+                   exec_body=prop_method_builder
                )
 
     return builder
@@ -222,7 +219,7 @@ def method_builder(spec, timeout):
 
     try:
         interface_name = spec.attrib['name']
-    except KeyError as err: # pragma: no cover
+    except KeyError as err:  # pragma: no cover
         raise DPClientGenerationError("No name found for interface.") from err
 
     def builder(namespace):
@@ -260,7 +257,7 @@ def method_builder(spec, timeout):
 
             try:
                 name = spec.attrib["name"]
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No name found for method.") \
                    from err
 
@@ -272,10 +269,10 @@ def method_builder(spec, timeout):
 
             try:
                 func = xformer(signature)
-            except IntoDPError as err: #pragma: no cover
+            except IntoDPError as err:  #pragma: no cover
                 raise DPClientGenerationError() from err
 
-            def dbus_func(proxy_object, func_args): # pragma: no cover
+            def dbus_func(proxy_object, func_args):  # pragma: no cover
                 """
                 The method proper.
 
@@ -284,8 +281,9 @@ def method_builder(spec, timeout):
                 :raises DPClientRuntimeError:
                 """
                 if arg_names_set != frozenset(func_args.keys()):
-                    raise DPClientInvalidArgError("Key mismatch: %s != %s" %
-                       (", ".join(arg_names), ", ".join(func_args.keys())))
+                    raise DPClientInvalidArgError(
+                        "Key mismatch: %s != %s" %
+                        (", ".join(arg_names), ", ".join(func_args.keys())))
                 args = \
                    [v for (k, v) in \
                    sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
@@ -296,9 +294,7 @@ def method_builder(spec, timeout):
                     raise DPClientInvalidArgError() from err
 
                 dbus_method = proxy_object.get_dbus_method(
-                   name,
-                   dbus_interface=interface_name
-                )
+                    name, dbus_interface=interface_name)
 
                 try:
                     return dbus_method(*xformed_args, timeout=timeout)
@@ -310,7 +306,7 @@ def method_builder(spec, timeout):
         for method in spec.findall('./method'):
             try:
                 name = method.attrib['name']
-            except KeyError as err: # pragma: no cover
+            except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No name found for method.") \
                    from err
 
@@ -343,16 +339,16 @@ def invoker_builder(spec, timeout):
         """
         namespace["Methods"] = \
            types.new_class(
-              "Methods",
-              bases=(object,),
-              exec_body=method_builder(spec, timeout)
+               "Methods",
+               bases=(object,),
+               exec_body=method_builder(spec, timeout)
            )
 
         namespace["Properties"] = \
            types.new_class(
-              "Properties",
-              bases=(object,),
-              exec_body=prop_builder(spec, timeout)
+               "Properties",
+               bases=(object,),
+               exec_body=prop_builder(spec, timeout)
            )
 
     return builder
@@ -370,4 +366,5 @@ def make_class(name, spec, timeout=-1):
     :returns: the constructed class
     :rtype: type
     """
-    return types.new_class(name, bases=(object,), exec_body=invoker_builder(spec, timeout))
+    return types.new_class(
+        name, bases=(object, ), exec_body=invoker_builder(spec, timeout))

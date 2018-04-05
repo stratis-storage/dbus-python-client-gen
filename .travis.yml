@@ -13,6 +13,7 @@ branches:
 
 env:
     matrix:
+        - TASK=fmt-travis
         - TASK=lint
         - TASK=test
         - TASK=coverage
