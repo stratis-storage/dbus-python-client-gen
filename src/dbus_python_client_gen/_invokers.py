@@ -187,9 +187,9 @@ def prop_builder(spec, timeout):
 
             namespace[name] = \
                types.new_class(
-                  name,
-                  bases=(object,),
-                  exec_body=prop_method_builder
+                   name,
+                   bases=(object,),
+                   exec_body=prop_method_builder
                )
 
     return builder
@@ -339,16 +339,16 @@ def invoker_builder(spec, timeout):
         """
         namespace["Methods"] = \
            types.new_class(
-              "Methods",
-              bases=(object,),
-              exec_body=method_builder(spec, timeout)
+               "Methods",
+               bases=(object,),
+               exec_body=method_builder(spec, timeout)
            )
 
         namespace["Properties"] = \
            types.new_class(
-              "Properties",
-              bases=(object,),
-              exec_body=prop_builder(spec, timeout)
+               "Properties",
+               bases=(object,),
+               exec_body=prop_builder(spec, timeout)
            )
 
     return builder
