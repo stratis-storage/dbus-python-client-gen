@@ -1,5 +1,12 @@
 TOX=tox
 
+.PHONY: fmt
+fmt:
+	yapf --style pep8 --recursive --in-place check.py setup.py src tests
+
+fmt-travis:
+	yapf --style pep8 --recursive --diff check.py setup.py src tests
+
 .PHONY: lint
 lint:
 	$(TOX) -c tox.ini -e lint
