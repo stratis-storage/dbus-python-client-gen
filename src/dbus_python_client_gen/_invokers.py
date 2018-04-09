@@ -280,7 +280,10 @@ def method_builder(spec, timeout):
             try:
                 func = xformer(signature)
             except IntoDPError as err:  #pragma: no cover
-                raise DPClientGenerationError() from err
+                raise DPClientGenerationError(
+                    "Failed to generate argument-transforming \
+                            function from signature \"%s\" for method \"%s\"" %
+                    (signature, name)) from err
 
             def dbus_func(proxy_object, func_args):  # pragma: no cover
                 """
