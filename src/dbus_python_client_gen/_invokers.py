@@ -262,10 +262,20 @@ def method_builder(spec, timeout):
                    from err
 
             inargs = spec.findall('./arg[@direction="in"]')
-            arg_names = [e.attrib["name"] for e in inargs]
+            try:
+                arg_names = [e.attrib["name"] for e in inargs]
+            except KeyError as err:  #pragma: no cover
+                raise DPClientGenerationError(
+                    "Missing name attribute for some argument for method \"%s\""
+                    % name) from err
             arg_names_set = frozenset(arg_names)
 
-            signature = "".join(e.attrib["type"] for e in inargs)
+            try:
+                signature = "".join(e.attrib["type"] for e in inargs)
+            except KeyError as err:  #pragma: no cover
+                raise DPClientGenerationError(
+                    "Missing type attribute for some argument for method \"%s\""
+                    % name) from err
 
             try:
                 func = xformer(signature)
