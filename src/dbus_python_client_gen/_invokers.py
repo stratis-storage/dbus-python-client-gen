@@ -308,15 +308,17 @@ def method_builder(interface_name, methods, timeout):
     return builder
 
 
-def invoker_builder(spec, timeout):
+def make_class(name, spec, timeout=-1):
     """
-    Returns a function that builds a method interface based on 'spec'.
+    Make a class, name, from the given spec.
+    The class defines static properties and methods according to the spec.
 
+    :param str name: the name of the class.
     :param spec: the interface specification
     :type spec: xml.element.ElementTree.Element
-    :param int timeout: Timeout for dbus client, -1 == libdbus default ~25s.
-
-    :raises DPClientGenerationError:
+    :param int timeout: dbus timeout for method(s), -1 is libdbus default ~25s.
+    :returns: the constructed class
+    :rtype: type
     """
 
     try:
@@ -355,20 +357,4 @@ def invoker_builder(spec, timeout):
                exec_body=prop_builder_arg
            )
 
-    return builder
-
-
-def make_class(name, spec, timeout=-1):
-    """
-    Make a class, name, from the given spec.
-    The class defines static properties and methods according to the spec.
-
-    :param str name: the name of the class.
-    :param spec: the interface specification
-    :type spec: xml.element.ElementTree.Element
-    :param int timeout: dbus timeout for method(s), -1 is libdbus default ~25s.
-    :returns: the constructed class
-    :rtype: type
-    """
-    return types.new_class(
-        name, bases=(object, ), exec_body=invoker_builder(spec, timeout))
+    return types.new_class(name, bases=(object, ), exec_body=builder)
