@@ -45,7 +45,8 @@ def prop_builder(spec, timeout):
     try:
         interface_name = spec.attrib['name']
     except KeyError as err:  # pragma: no cover
-        raise DPClientGenerationError("No name found for interface.") from err
+        raise DPClientGenerationError(
+            "No name attribute found for interface.") from err
 
     def builder(namespace):
         """
@@ -78,7 +79,7 @@ def prop_builder(spec, timeout):
             try:
                 name = spec.attrib['name']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No name found for property.") \
+                raise DPClientGenerationError("No name attribute found for property.") \
                    from err
 
             def dbus_func(proxy_object):  # pragma: no cover
@@ -107,19 +108,22 @@ def prop_builder(spec, timeout):
             try:
                 name = spec.attrib['name']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No name found for property.") \
+                raise DPClientGenerationError("No name attribute found for property.") \
                    from err
 
             try:
                 signature = spec.attrib['type']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No type found for property.") \
+                raise DPClientGenerationError("No type attribute found for property.") \
                    from err
 
             try:
                 func = xformers(signature)[0]
             except IntoDPError as err:  #pragma: no cover
-                raise DPClientGenerationError() from err
+                raise DPClientGenerationError(
+                    "Failed to generate argument-transforming \
+                            function from signature \"%s\" for property \"%s\""
+                    & (signature, name)) from err
 
             def dbus_func(proxy_object, value):  # pragma: no cover
                 """
@@ -262,15 +266,28 @@ def method_builder(spec, timeout):
                    from err
 
             inargs = spec.findall('./arg[@direction="in"]')
-            arg_names = [e.attrib["name"] for e in inargs]
+            try:
+                arg_names = [e.attrib["name"] for e in inargs]
+            except KeyError as err:  #pragma: no cover
+                raise DPClientGenerationError(
+                    "Missing name attribute for some argument for method \"%s\""
+                    % name) from err
             arg_names_set = frozenset(arg_names)
 
-            signature = "".join(e.attrib["type"] for e in inargs)
+            try:
+                signature = "".join(e.attrib["type"] for e in inargs)
+            except KeyError as err:  #pragma: no cover
+                raise DPClientGenerationError(
+                    "Missing type attribute for some argument for method \"%s\""
+                    % name) from err
 
             try:
                 func = xformer(signature)
             except IntoDPError as err:  #pragma: no cover
-                raise DPClientGenerationError() from err
+                raise DPClientGenerationError(
+                    "Failed to generate argument-transforming \
+                            function from signature \"%s\" for method \"%s\"" %
+                    (signature, name)) from err
 
             def dbus_func(proxy_object, func_args):  # pragma: no cover
                 """
