@@ -123,6 +123,46 @@ def prop_builder(interface_name, properties, timeout):
 
             return dbus_func
 
+        def build_property(access, name, signature):
+            """
+            Select among getter, setter, or both methods for a given property.
+
+            :param str access: "read", "write", or "readwrite"
+            :param str name: the name of the property
+            :param str signature: the signature of the property
+
+            :returns: a function which adds up to two methods to the namespace
+            """
+            if access == "read":
+                getter = build_property_getter(name)
+
+                def prop_method_builder(namespace):
+                    """
+                    Attaches getter to namespace.
+                    """
+                    namespace['Get'] = staticmethod(getter)
+
+            elif access == "write":
+                setter = build_property_setter(name, signature)
+
+                def prop_method_builder(namespace):
+                    """
+                    Attaches setter to namespace
+                    """
+                    namespace['Set'] = staticmethod(setter)
+            else:
+                getter = build_property_getter(name)
+                setter = build_property_setter(name, signature)
+
+                def prop_method_builder(namespace):
+                    """
+                    Attaches getter and setter to namespace
+                    """
+                    namespace['Get'] = staticmethod(getter)
+                    namespace['Set'] = staticmethod(setter)
+
+            return prop_method_builder
+
         for prop in properties:
             try:
                 name = prop.attrib['name']
@@ -135,49 +175,17 @@ def prop_builder(interface_name, properties, timeout):
             except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No access attribute found for property.") \
                    from err
-
             try:
                 signature = prop.attrib['type']
             except KeyError as err:  # pragma: no cover
                 raise DPClientGenerationError("No type attribute found for property.") \
                    from err
 
-            if access == "read":
-                getter = build_property_getter(name)
-
-                def prop_method_builder(namespace):
-                    """
-                    Attaches appropriate methods to namespace.
-                    """
-                    # pylint: disable=cell-var-from-loop
-                    namespace['Get'] = staticmethod(getter)
-
-            elif access == "write":
-                setter = build_property_setter(name, signature)
-
-                def prop_method_builder(namespace):
-                    """
-                    Attaches appropriate methods to namespace.
-                    """
-                    # pylint: disable=cell-var-from-loop
-                    namespace['Set'] = staticmethod(setter)
-            else:
-                getter = build_property_getter(name)
-                setter = build_property_setter(name, signature)
-
-                def prop_method_builder(namespace):
-                    """
-                    Attaches appropriate methods to namespace.
-                    """
-                    # pylint: disable=cell-var-from-loop
-                    namespace['Get'] = staticmethod(getter)
-                    namespace['Set'] = staticmethod(setter)
-
             namespace[name] = \
                types.new_class(
                    name,
                    bases=(object,),
-                   exec_body=prop_method_builder
+                   exec_body=build_property(access, name, signature)
                )
 
     return builder
