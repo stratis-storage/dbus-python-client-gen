@@ -77,10 +77,12 @@ def prop_builder(interface_name, properties, timeout):
         try:
             func = xformers(signature)[0]
         except IntoDPError as err:  #pragma: no cover
-            raise DPClientGenerationError(
-                "Failed to generate argument-transforming \
-                        function from signature \"%s\" for property \"%s\""
-                & (signature, name)) from err
+            fmt_str = (
+                "Failed to generate argument-transforming function from "
+                "signature \"%s\" for Set method for property \"%s\" "
+                "belonging to interface \"%s\"")
+            raise DPClientGenerationError(fmt_str % (signature, name,
+                                                     interface_name)) from err
 
         def dbus_func(proxy_object, value):  # pragma: no cover
             """
@@ -166,19 +168,25 @@ def prop_builder(interface_name, properties, timeout):
             try:
                 name = prop.attrib['name']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No name attribute found for property.") \
-                   from err
+                fmt_str = ("No name attribute found for property belonging to "
+                           "interface \"%s\"")
+                raise DPClientGenerationError(
+                    fmt_str % interface_name) from err
 
             try:
                 access = prop.attrib['access']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No access attribute found for property.") \
-                   from err
+                fmt_str = ("No access attribute found for property \"%s\" "
+                           "belonging to interface \"%s\"")
+                raise DPClientGenerationError(fmt_str %
+                                              (name, interface_name)) from err
             try:
                 signature = prop.attrib['type']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No type attribute found for property.") \
-                   from err
+                fmt_str = ("No type attribute found for property \"%s\" "
+                           "belonging to interface \"%s\"")
+                raise DPClientGenerationError(fmt_str %
+                                              (name, interface_name)) from err
 
             namespace[name] = \
                types.new_class(
@@ -224,26 +232,29 @@ def method_builder(interface_name, methods, timeout):
         try:
             arg_names = [e.attrib["name"] for e in inargs]
         except KeyError as err:  # pragma: no cover
-            raise DPClientGenerationError(
-                "Missing name attribute for some argument for method \"%s\"" %
-                name) from err
+            fmt_str = ("No name attribute found for some argument for method "
+                       "\"%s\" belonging to interface \"%s\"")
+            raise DPClientGenerationError(fmt_str % (name,
+                                                     interface_name)) from err
 
         arg_names_set = frozenset(arg_names)
 
         try:
             signature = "".join(e.attrib["type"] for e in inargs)
         except KeyError as err:  #pragma: no cover
-            raise DPClientGenerationError(
-                "Missing type attribute for some argument for method \"%s\"" %
-                name) from err
+            fmt_str = ("No type attribute found for some argument for method "
+                       "\"%s\" belonging to interface \"%s\"")
+            raise DPClientGenerationError(fmt_str % (name,
+                                                     interface_name)) from err
 
         try:
             func = xformer(signature)
         except IntoDPError as err:  #pragma: no cover
-            raise DPClientGenerationError(
-                "Failed to generate argument-transforming \
-                        function from signature \"%s\" for method \"%s\"" %
-                (signature, name)) from err
+            fmt_str = ("Failed to generate argument-transforming function "
+                       "from signature \"%s\" for method \"%s\" belonging to "
+                       "interface \"%s\"")
+            raise DPClientGenerationError(fmt_str % (signature, name,
+                                                     interface_name)) from err
 
         def dbus_func(proxy_object, func_args):  # pragma: no cover
             """
@@ -304,8 +315,10 @@ def method_builder(interface_name, methods, timeout):
             try:
                 name = method.attrib['name']
             except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError("No name attribute found for method.") \
-                   from err
+                fmt_str = ("No name attribute found for method belonging to "
+                           "interface \"%s\"")
+                raise DPClientGenerationError(
+                    fmt_str % interface_name) from err
 
             the_method = \
                build_method(name, method.findall('./arg[@direction="in"]'))
@@ -331,7 +344,7 @@ def make_class(name, spec, timeout=-1):
         interface_name = spec.attrib['name']
     except KeyError as err:  # pragma: no cover
         raise DPClientGenerationError(
-            "No name attribute found for interface.") from err
+            "No name attribute found for interface") from err
 
     method_builder_arg = \
        method_builder(interface_name, spec.findall("./method"), timeout)
