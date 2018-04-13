@@ -43,6 +43,105 @@ def prop_builder(interface_name, properties, timeout):
     :raises DPClientGenerationError:
     """
 
+    def build_property_getter(name):
+        """
+        Build a single property getter for this class.
+
+        :param str name: the name of the property
+        """
+
+        def dbus_func(proxy_object):  # pragma: no cover
+            """
+            The property getter.
+
+            :raises DPClientInvocationError:
+            """
+            try:
+                return proxy_object.Get(
+                    interface_name,
+                    name,
+                    dbus_interface=dbus.PROPERTIES_IFACE,
+                    timeout=timeout)
+            except dbus.DBusException as err:
+                raise DPClientInvocationError() from err
+
+        return dbus_func
+
+    def build_property_setter(name, signature):
+        """
+        Build a single property setter for this class.
+
+        :param str name: the name of the property
+        :param str signature: the signature of the property
+        """
+        try:
+            func = xformers(signature)[0]
+        except IntoDPError as err:  #pragma: no cover
+            raise DPClientGenerationError(
+                "Failed to generate argument-transforming \
+                        function from signature \"%s\" for property \"%s\""
+                & (signature, name)) from err
+
+        def dbus_func(proxy_object, value):  # pragma: no cover
+            """
+            The property setter.
+
+            :raises DPClientRuntimeError:
+            """
+            try:
+                return proxy_object.Set(
+                    interface_name,
+                    name,
+                    func(value),
+                    dbus_interface=dbus.PROPERTIES_IFACE,
+                    timeout=timeout)
+            except dbus.DBusException as err:
+                raise DPClientInvocationError() from err
+            except IntoDPError as err:
+                raise DPClientInvalidArgError() from err
+
+        return dbus_func
+
+    def build_property(access, name, signature):
+        """
+        Select among getter, setter, or both methods for a given property.
+
+        :param str access: "read", "write", or "readwrite"
+        :param str name: the name of the property
+        :param str signature: the signature of the property
+
+        :returns: a function which adds up to two methods to the namespace
+        """
+        if access == "read":
+            getter = build_property_getter(name)
+
+            def prop_method_builder(namespace):
+                """
+                Attaches getter to namespace.
+                """
+                namespace['Get'] = staticmethod(getter)
+
+        elif access == "write":
+            setter = build_property_setter(name, signature)
+
+            def prop_method_builder(namespace):
+                """
+                Attaches setter to namespace
+                """
+                namespace['Set'] = staticmethod(setter)
+        else:
+            getter = build_property_getter(name)
+            setter = build_property_setter(name, signature)
+
+            def prop_method_builder(namespace):
+                """
+                Attaches getter and setter to namespace
+                """
+                namespace['Get'] = staticmethod(getter)
+                namespace['Set'] = staticmethod(setter)
+
+        return prop_method_builder
+
     def builder(namespace):
         """
         Fills the namespace of the parent class with class members that are
@@ -63,106 +162,6 @@ def prop_builder(interface_name, properties, timeout):
 
         :param namespace: the class's namespace
         """
-
-        def build_property_getter(name):
-            """
-            Build a single property getter for this class.
-
-            :param str name: the name of the property
-            """
-
-            def dbus_func(proxy_object):  # pragma: no cover
-                """
-                The property getter.
-
-                :raises DPClientInvocationError:
-                """
-                try:
-                    return proxy_object.Get(
-                        interface_name,
-                        name,
-                        dbus_interface=dbus.PROPERTIES_IFACE,
-                        timeout=timeout)
-                except dbus.DBusException as err:
-                    raise DPClientInvocationError() from err
-
-            return dbus_func
-
-        def build_property_setter(name, signature):
-            """
-            Build a single property setter for this class.
-
-            :param str name: the name of the property
-            :param str signature: the signature of the property
-            """
-            try:
-                func = xformers(signature)[0]
-            except IntoDPError as err:  #pragma: no cover
-                raise DPClientGenerationError(
-                    "Failed to generate argument-transforming \
-                            function from signature \"%s\" for property \"%s\""
-                    & (signature, name)) from err
-
-            def dbus_func(proxy_object, value):  # pragma: no cover
-                """
-                The property setter.
-
-                :raises DPClientRuntimeError:
-                """
-                try:
-                    return proxy_object.Set(
-                        interface_name,
-                        name,
-                        func(value),
-                        dbus_interface=dbus.PROPERTIES_IFACE,
-                        timeout=timeout)
-                except dbus.DBusException as err:
-                    raise DPClientInvocationError() from err
-                except IntoDPError as err:
-                    raise DPClientInvalidArgError() from err
-
-            return dbus_func
-
-        def build_property(access, name, signature):
-            """
-            Select among getter, setter, or both methods for a given property.
-
-            :param str access: "read", "write", or "readwrite"
-            :param str name: the name of the property
-            :param str signature: the signature of the property
-
-            :returns: a function which adds up to two methods to the namespace
-            """
-            if access == "read":
-                getter = build_property_getter(name)
-
-                def prop_method_builder(namespace):
-                    """
-                    Attaches getter to namespace.
-                    """
-                    namespace['Get'] = staticmethod(getter)
-
-            elif access == "write":
-                setter = build_property_setter(name, signature)
-
-                def prop_method_builder(namespace):
-                    """
-                    Attaches setter to namespace
-                    """
-                    namespace['Set'] = staticmethod(setter)
-            else:
-                getter = build_property_getter(name)
-                setter = build_property_setter(name, signature)
-
-                def prop_method_builder(namespace):
-                    """
-                    Attaches getter and setter to namespace
-                    """
-                    namespace['Get'] = staticmethod(getter)
-                    namespace['Set'] = staticmethod(setter)
-
-            return prop_method_builder
-
         for prop in properties:
             try:
                 name = prop.attrib['name']
@@ -214,6 +213,69 @@ def method_builder(interface_name, methods, timeout):
     :raises DPClientGenerationError:
     """
 
+    def build_method(name, inargs):
+        """
+        Build a method for this class.
+
+        :param str name: the name of the method
+        :param inargs: the in-arguments to this methods
+        :type inargs: iterable of Element
+        """
+        try:
+            arg_names = [e.attrib["name"] for e in inargs]
+        except KeyError as err:  # pragma: no cover
+            raise DPClientGenerationError(
+                "Missing name attribute for some argument for method \"%s\"" %
+                name) from err
+
+        arg_names_set = frozenset(arg_names)
+
+        try:
+            signature = "".join(e.attrib["type"] for e in inargs)
+        except KeyError as err:  #pragma: no cover
+            raise DPClientGenerationError(
+                "Missing type attribute for some argument for method \"%s\"" %
+                name) from err
+
+        try:
+            func = xformer(signature)
+        except IntoDPError as err:  #pragma: no cover
+            raise DPClientGenerationError(
+                "Failed to generate argument-transforming \
+                        function from signature \"%s\" for method \"%s\"" %
+                (signature, name)) from err
+
+        def dbus_func(proxy_object, func_args):  # pragma: no cover
+            """
+            The method proper.
+
+            :param func_args: The function arguments
+            :type func_args: dict
+            :raises DPClientRuntimeError:
+            """
+            if arg_names_set != frozenset(func_args.keys()):
+                raise DPClientInvalidArgError("Key mismatch: %s != %s" %
+                                              (", ".join(arg_names),
+                                               ", ".join(func_args.keys())))
+            args = \
+               [v for (k, v) in \
+               sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
+
+            try:
+                xformed_args = func(args)
+            except IntoDPError as err:
+                raise DPClientInvalidArgError() from err
+
+            dbus_method = proxy_object.get_dbus_method(
+                name, dbus_interface=interface_name)
+
+            try:
+                return dbus_method(*xformed_args, timeout=timeout)
+            except dbus.DBusException as err:
+                raise DPClientInvocationError() from err
+
+        return dbus_func
+
     def builder(namespace):
         """
         Fills the namespace of the parent class with class members that are
@@ -238,70 +300,6 @@ def method_builder(interface_name, methods, timeout):
 
         :param namespace: the class's namespace
         """
-
-        def build_method(name, inargs):
-            """
-            Build a method for this class.
-
-            :param str name: the name of the method
-            :param inargs: the in-arguments to this methods
-            :type inargs: iterable of Element
-            """
-            try:
-                arg_names = [e.attrib["name"] for e in inargs]
-            except KeyError as err:  # pragma: no cover
-                raise DPClientGenerationError(
-                    "Missing name attribute for some argument for method \"%s\""
-                    % name) from err
-
-            arg_names_set = frozenset(arg_names)
-
-            try:
-                signature = "".join(e.attrib["type"] for e in inargs)
-            except KeyError as err:  #pragma: no cover
-                raise DPClientGenerationError(
-                    "Missing type attribute for some argument for method \"%s\""
-                    % name) from err
-
-            try:
-                func = xformer(signature)
-            except IntoDPError as err:  #pragma: no cover
-                raise DPClientGenerationError(
-                    "Failed to generate argument-transforming \
-                            function from signature \"%s\" for method \"%s\"" %
-                    (signature, name)) from err
-
-            def dbus_func(proxy_object, func_args):  # pragma: no cover
-                """
-                The method proper.
-
-                :param func_args: The function arguments
-                :type func_args: dict
-                :raises DPClientRuntimeError:
-                """
-                if arg_names_set != frozenset(func_args.keys()):
-                    raise DPClientInvalidArgError(
-                        "Key mismatch: %s != %s" %
-                        (", ".join(arg_names), ", ".join(func_args.keys())))
-                args = \
-                   [v for (k, v) in \
-                   sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
-
-                try:
-                    xformed_args = func(args)
-                except IntoDPError as err:
-                    raise DPClientInvalidArgError() from err
-
-                dbus_method = proxy_object.get_dbus_method(
-                    name, dbus_interface=interface_name)
-
-                try:
-                    return dbus_method(*xformed_args, timeout=timeout)
-                except dbus.DBusException as err:
-                    raise DPClientInvocationError() from err
-
-            return dbus_func
-
         for method in methods:
             try:
                 name = method.attrib['name']
