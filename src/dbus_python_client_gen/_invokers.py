@@ -12,8 +12,12 @@ from into_dbus_python import xformer
 from into_dbus_python import xformers
 
 from ._errors import DPClientGenerationError
-from ._errors import DPClientInvalidArgError
+from ._errors import DPClientGetPropertyContext
 from ._errors import DPClientInvocationError
+from ._errors import DPClientKeywordError
+from ._errors import DPClientMarshallingError
+from ._errors import DPClientMethodCallContext
+from ._errors import DPClientSetPropertyContext
 
 
 def prop_builder(interface_name, properties, timeout):
@@ -63,7 +67,12 @@ def prop_builder(interface_name, properties, timeout):
                     dbus_interface=dbus.PROPERTIES_IFACE,
                     timeout=timeout)
             except dbus.DBusException as err:
-                raise DPClientInvocationError() from err
+                err_msg = ("Error while getting value for property \"%s\" "
+                           "belonging to interface \"%s\"") % (name,
+                                                               interface_name)
+                raise DPClientInvocationError(
+                    err_msg, interface_name,
+                    DPClientGetPropertyContext(name)) from err
 
         return dbus_func
 
@@ -91,16 +100,30 @@ def prop_builder(interface_name, properties, timeout):
             :raises DPClientRuntimeError:
             """
             try:
+                arg = func(value)
+            except IntoDPError as err:
+                err_msg = (
+                    "Failed to format argument \"%s\" according to signature "
+                    "\"%s\" for setter method for property \"%s\" belonging to "
+                    "interface \"%s\"") % (value, signature, name,
+                                           interface_name)
+                raise DPClientMarshallingError(err_msg, interface_name,
+                                               signature, [value]) from err
+
+            try:
                 return proxy_object.Set(
                     interface_name,
                     name,
-                    func(value),
+                    arg,
                     dbus_interface=dbus.PROPERTIES_IFACE,
                     timeout=timeout)
             except dbus.DBusException as err:
-                raise DPClientInvocationError() from err
-            except IntoDPError as err:
-                raise DPClientInvalidArgError() from err
+                err_msg = ("Error while setting value of property \"%s\" "
+                           "belonging to interface \"%s\" to value \"%s\"") % (
+                               name, interface_name, arg)
+                raise DPClientInvocationError(err_msg, interface_name,
+                                              DPClientSetPropertyContext(
+                                                  name, arg)) from err
 
         return dbus_func
 
@@ -237,8 +260,6 @@ def method_builder(interface_name, methods, timeout):
             raise DPClientGenerationError(fmt_str % (name,
                                                      interface_name)) from err
 
-        arg_names_set = frozenset(arg_names)
-
         try:
             signature = "".join(e.attrib["type"] for e in inargs)
         except KeyError as err:  #pragma: no cover
@@ -255,6 +276,7 @@ def method_builder(interface_name, methods, timeout):
                        "interface \"%s\"")
             raise DPClientGenerationError(fmt_str % (signature, name,
                                                      interface_name)) from err
+        arg_names_set = frozenset(arg_names)
 
         def dbus_func(proxy_object, func_args):  # pragma: no cover
             """
@@ -265,9 +287,16 @@ def method_builder(interface_name, methods, timeout):
             :raises DPClientRuntimeError:
             """
             if arg_names_set != frozenset(func_args.keys()):
-                raise DPClientInvalidArgError("Key mismatch: %s != %s" %
-                                              (", ".join(arg_names),
-                                               ", ".join(func_args.keys())))
+                param_list = [arg for arg in arg_names_set]
+                arg_list = [arg for arg in func_args.keys()]
+                err_msg = ("Argument keywords passed (%s) did not match "
+                           "argument keywords expected (%s) for method \"%s\" "
+                           "belonging to interface \"%s\"") % (
+                               ", ".join(arg_list), ", ".join(param_list),
+                               name, interface_name)
+                raise DPClientKeywordError(err_msg, interface_name, name,
+                                           arg_list, param_list)
+
             args = \
                [v for (k, v) in \
                sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
@@ -275,7 +304,13 @@ def method_builder(interface_name, methods, timeout):
             try:
                 xformed_args = func(args)
             except IntoDPError as err:
-                raise DPClientInvalidArgError() from err
+                arg_str = ", ".join(str(arg) for arg in args)
+                err_msg = ("Failed to format arguments (%s) according to "
+                           "signature \"%s\" for method \"%s\" belonging to "
+                           "interface \"%s\"") % (arg_str, signature, name,
+                                                  interface_name)
+                raise DPClientMarshallingError(err_msg, interface_name,
+                                               signature, args) from err
 
             dbus_method = proxy_object.get_dbus_method(
                 name, dbus_interface=interface_name)
@@ -283,7 +318,13 @@ def method_builder(interface_name, methods, timeout):
             try:
                 return dbus_method(*xformed_args, timeout=timeout)
             except dbus.DBusException as err:
-                raise DPClientInvocationError() from err
+                arg_str = ", ".join(str(arg) for arg in xformed_args)
+                err_msg = ("Error while invoking method \"%s\" belonging to "
+                           "interface \"%s\" with arguments (%s)") % (
+                               name, interface_name, arg_str)
+                raise DPClientInvocationError(err_msg, interface_name,
+                                              DPClientMethodCallContext(
+                                                  name, xformed_args)) from err
 
         return dbus_func
 
