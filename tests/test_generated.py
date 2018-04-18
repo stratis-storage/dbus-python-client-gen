@@ -57,7 +57,7 @@ class TestCase(unittest.TestCase):
         the properties it should have.
         """
         for name, spec in self._data.items():
-            builder = prop_builder(spec, -1)
+            builder = prop_builder(name, spec.findall("./property"), -1)
             klass = types.new_class(name, bases=(object, ), exec_body=builder)
             for prop in spec.findall("./property"):
                 self._test_property(klass, prop)
@@ -79,7 +79,7 @@ class TestCase(unittest.TestCase):
         the properties it should have.
         """
         for name, spec in self._data.items():
-            builder = method_builder(spec, -1)
+            builder = method_builder(name, spec.findall("./method"), -1)
             klass = types.new_class(name, bases=(object, ), exec_body=builder)
             for method in spec.findall("./method"):
                 self._test_method(klass, method)
