@@ -22,3 +22,12 @@ test:
 .PHONY: upload-release
 upload-release:
 	python setup.py register sdist upload
+
+PYREVERSE_OPTS = --output=pdf
+.PHONY: view
+view:
+	-rm -Rf _pyreverse
+	mkdir _pyreverse
+	PYTHONPATH=src pyreverse ${PYREVERSE_OPTS} --project="dbus-python-client-gen" src/dbus_python_client_gen
+	mv classes_dbus-python-client-gen.pdf _pyreverse
+	mv packages_dbus-python-client-gen.pdf _pyreverse
