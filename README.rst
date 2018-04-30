@@ -50,9 +50,54 @@ or without all the necessary keywords as, ::
 
 Errors
 ------
-This library exports one exception type, DPClientError. It constitutes a bug
-if an error of any other type is propagated during class generation or when
-the methods of the class are executed.
+This library exports the exception type, DPClientError and all its subtypes.
+It constitutes a bug if an error of any other type is propagated during class
+generation or when the methods of the class are executed.
+
+The following shows the error hierarchy. Entries after the dash indicate
+additional fields, beyond the message, which the exception contains. Only
+leaves of the error class heirarchy are constructed directly.
+
+
+DPClientError
+
+  * DPClientGenerationError
+    This exception is raised if an error occurs while generating the method.
+    Such an exception would result from introspection data which lacked the
+    necessary attributes or entries.
+
+  * DPClientRuntimeError - interface name
+    This exception is raised if there is an error while the generated method is
+    executing.
+
+    - DPClientInvalidArgError
+      This exception is raised if the arguments to be passed to the D-Bus
+      method are incorrect.
+
+        * DPClientKeywordError - method name, expected and actual keywords
+          This exception is raised if there are missing or unexpected arguments.
+
+        * DPClientMarshallingError - original arguments
+          This exception is raised if the arguments can not be transformed to
+          their required dbus-python types.
+
+    - DPClientInvocationError - invocation context
+      This exception is raised if a dbus-python method is invoked and some error
+      occurs. This exception's invocation context is used to distinguish between
+      a method call, a get property call, and a set property call. The context
+      is an object of type DPClientInvocationContext.
+
+The DPClientInvocationContext hierarchy is shown below. Entries after the
+dash indicate the fields in the context.
+
+DPClientInvocationContext
+
+  * DPClientMethodCallContext - method name, arguments
+
+  * DPClientGetPropertyContext - property name
+
+  * DPClientSetPropertyContext - property name, value
+
 
 Dependencies
 ------------
