@@ -51,7 +51,7 @@ class TestCase(unittest.TestCase):
         if "write" in access:
             self.assertTrue(hasattr(prop_klass, "Set"))
 
-    def _testProperties(self):
+    def _test_properties(self):
         """
         Generate a klass from an interface spec and verify that it has
         the properties it should have.
@@ -73,7 +73,7 @@ class TestCase(unittest.TestCase):
         name = method.attrib['name']
         self.assertTrue(hasattr(klass, name))
 
-    def _testMethods(self):
+    def _test_methods(self):
         """
         Generate a class from an interface spec and verify that it has
         the properties it should have.
@@ -84,7 +84,7 @@ class TestCase(unittest.TestCase):
             for method in spec.findall("./method"):
                 self._test_method(klass, method)
 
-    def _testKlass(self):
+    def _test_klass(self):
         """
         Generate a class from an interface spec and verify that it has two
         fields, "Properties" and "Methods".
@@ -101,10 +101,10 @@ class TestCase(unittest.TestCase):
             for prop in spec.findall("./property"):
                 self._test_property(properties, prop)
 
-    def testSpecs(self):
+    def test_specs(self):
         """
         Test properties and methods of all specs available.
         """
-        self._testProperties()
-        self._testMethods()
-        self._testKlass()
+        self._test_properties()
+        self._test_methods()
+        self._test_klass()
