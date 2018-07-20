@@ -6,7 +6,7 @@ Exception hierarchy for this package.
 """
 
 
-class DPClientInvocationContext(object):
+class DPClientInvocationContext():
     """
     Identifies the context in which an invocation error occurred.
 
