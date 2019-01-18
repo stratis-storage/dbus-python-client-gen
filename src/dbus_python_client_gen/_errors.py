@@ -15,7 +15,6 @@ class DPClientInvocationContext():
     be different.
     """
     # pylint: disable=too-few-public-methods
-    pass
 
 
 class DPClientMethodCallContext(DPClientInvocationContext):
@@ -75,14 +74,12 @@ class DPClientError(Exception):
     """
     Top-level error.
     """
-    pass
 
 
 class DPClientGenerationError(DPClientError):
     """
     Exception during generation of classes.
     """
-    pass
 
 
 class DPClientRuntimeError(DPClientError):
@@ -124,7 +121,6 @@ class DPClientInvalidArgError(DPClientRuntimeError):
     """
     Exception raised when an invalid argument is passed to a generated method.
     """
-    pass
 
 
 class DPClientMarshallingError(DPClientInvalidArgError):
