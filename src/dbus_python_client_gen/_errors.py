@@ -7,7 +7,13 @@ Exception hierarchy for this package.
 
 from abc import ABC
 
+# Put this pylint directive at module level. There's a slight bug in pylint
+# that causes the directive to be ignored if there is no body to a class
+# (because the pass statement is omitted). On the other hand, pylint now
+# warns if it finds an unnecessary pass statement. This is the easiest course.
 
+
+# pylint: disable=too-few-public-methods
 class DPClientInvocationContext(ABC):
     """
     Identifies the context in which an invocation error occurred.
@@ -22,8 +28,6 @@ class DPClientMethodCallContext(DPClientInvocationContext):
     """
     Distinguishes a method call.
     """
-
-    # pylint: disable=too-few-public-methods
 
     def __init__(self, method_name, method_args):  # pragma: no cover
         """
@@ -42,8 +46,6 @@ class DPClientGetPropertyContext(DPClientInvocationContext):
     Get call on a property.
     """
 
-    # pylint: disable=too-few-public-methods
-
     def __init__(self, property_name):  # pragma: no cover
         """
         Construct property information.
@@ -57,8 +59,6 @@ class DPClientSetPropertyContext(DPClientInvocationContext):
     """
     Set call on a property.
     """
-
-    # pylint: disable=too-few-public-methods
 
     def __init__(self, property_name, value):  # pragma: no cover
         """
