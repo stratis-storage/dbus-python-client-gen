@@ -5,8 +5,10 @@
 Exception hierarchy for this package.
 """
 
+from abc import ABC
 
-class DPClientInvocationContext():
+
+class DPClientInvocationContext(ABC):
     """
     Identifies the context in which an invocation error occurred.
 
@@ -14,7 +16,6 @@ class DPClientInvocationContext():
     an actual method call. In each case, the fields of the subclass will
     be different.
     """
-    # pylint: disable=too-few-public-methods
 
 
 class DPClientMethodCallContext(DPClientInvocationContext):
