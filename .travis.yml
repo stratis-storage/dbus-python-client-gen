@@ -1,21 +1,19 @@
 os: linux
+language: python
+python: "3.4" # dbus-python can not be built on higher versions of Python
 
 addons:
   apt:
     packages:
       libdbus-glib-1-dev
 
-language: python
-python: "3.4"
-
 branches:
     only: master
 
 env:
-    matrix:
-        - TASK=fmt-travis
-        - TASK=lint
-        - TASK=test
-        - TASK=coverage
+  - TASK=fmt-travis
+  - TASK=lint
+  - TASK=test
+  - TASK=coverage
 
 script: make -f Makefile $TASK
