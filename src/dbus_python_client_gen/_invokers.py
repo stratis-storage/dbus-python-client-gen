@@ -316,7 +316,8 @@ def method_builder(interface_name, methods, timeout):
                 name, dbus_interface=interface_name)
 
             try:
-                return dbus_method(*xformed_args, timeout=timeout)
+                return dbus_method(
+                    *xformed_args, signature=signature, timeout=timeout)
             except dbus.DBusException as err:
                 arg_str = ", ".join(str(arg) for arg in xformed_args)
                 err_msg = ("Error while invoking method \"%s\" belonging to "
