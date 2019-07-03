@@ -42,7 +42,7 @@ setuptools.setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    install_requires=["dbus-python", "into-dbus-python>=0.06"],
+    install_requires=["dbus-python", "into-dbus-python>=0.08"],
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
     url="https://github.com/mulkieran/dbus-python-client-gen",
