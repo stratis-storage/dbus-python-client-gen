@@ -28,7 +28,7 @@ class TestCase(unittest.TestCase):
         self._data = dict()
         datadir = os.path.join(self._DIRNAME, "data")
         for name in os.listdir(datadir):
-            if name[-4:] != '.xml':
+            if name[-4:] != ".xml":
                 continue
             path = os.path.join(datadir, name)
             with open(path) as opath:
@@ -42,9 +42,9 @@ class TestCase(unittest.TestCase):
         :param prop: a specification of the property
         :type prop: Element
         """
-        name = prop.attrib['name']
+        name = prop.attrib["name"]
         self.assertTrue(hasattr(klass, name))
-        access = prop.attrib['access']
+        access = prop.attrib["access"]
         prop_klass = getattr(klass, name)
         if "read" in access:
             self.assertTrue(hasattr(prop_klass, "Get"))
@@ -58,7 +58,7 @@ class TestCase(unittest.TestCase):
         """
         for name, spec in self._data.items():
             builder = prop_builder(name, spec.findall("./property"), -1)
-            klass = types.new_class(name, bases=(object, ), exec_body=builder)
+            klass = types.new_class(name, bases=(object,), exec_body=builder)
             for prop in spec.findall("./property"):
                 self._test_property(klass, prop)
 
@@ -70,7 +70,7 @@ class TestCase(unittest.TestCase):
         :param method: a specification of the method
         :type method: Element
         """
-        name = method.attrib['name']
+        name = method.attrib["name"]
         self.assertTrue(hasattr(klass, name))
 
     def _test_methods(self):
@@ -80,7 +80,7 @@ class TestCase(unittest.TestCase):
         """
         for name, spec in self._data.items():
             builder = method_builder(name, spec.findall("./method"), -1)
-            klass = types.new_class(name, bases=(object, ), exec_body=builder)
+            klass = types.new_class(name, bases=(object,), exec_body=builder)
             for method in spec.findall("./method"):
                 self._test_method(klass, method)
 
