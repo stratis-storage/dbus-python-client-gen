@@ -129,8 +129,14 @@ class DPClientMarshallingError(DPClientInvalidArgError):
     Exception raised when the arguments could not be marshalled properly.
     """
 
-    def __init__(self, message, interface_name, signature,
-                 arguments):  # pragma: no cover
+    def __init__(
+        # pylint: disable=bad-continuation
+        self,
+        message,
+        interface_name,
+        signature,
+        arguments,
+    ):  # pragma: no cover
         """
         Initialize a DPClientMarshallingError with the arguments that failed.
         All DPClientMarshallingErrors are guaranteed to have a non-empty list
@@ -151,8 +157,15 @@ class DPClientKeywordError(DPClientInvalidArgError):
     Exception raised when keywords used do not match keywords expected.
     """
 
-    def __init__(self, message, interface_name, method_name, expected,
-                 actual):  # pragma: no cover
+    def __init__(
+        # pylint: disable=bad-continuation
+        self,
+        message,
+        interface_name,
+        method_name,
+        expected,
+        actual,
+    ):  # pragma: no cover
         # pylint: disable=too-many-arguments
         """
         Initialize a DPClientKeywordError with the mismatched arguments.

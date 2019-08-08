@@ -65,14 +65,16 @@ def prop_builder(interface_name, properties, timeout):
                     interface_name,
                     name,
                     dbus_interface=dbus.PROPERTIES_IFACE,
-                    timeout=timeout)
+                    timeout=timeout,
+                )
             except dbus.DBusException as err:
-                err_msg = ("Error while getting value for property \"%s\" "
-                           "belonging to interface \"%s\"") % (name,
-                                                               interface_name)
+                err_msg = (
+                    'Error while getting value for property "%s" '
+                    'belonging to interface "%s"'
+                ) % (name, interface_name)
                 raise DPClientInvocationError(
-                    err_msg, interface_name,
-                    DPClientGetPropertyContext(name)) from err
+                    err_msg, interface_name, DPClientGetPropertyContext(name)
+                ) from err
 
         return dbus_func
 
@@ -85,13 +87,15 @@ def prop_builder(interface_name, properties, timeout):
         """
         try:
             func = xformers(signature)[0]
-        except IntoDPError as err:  #pragma: no cover
+        except IntoDPError as err:  # pragma: no cover
             fmt_str = (
                 "Failed to generate argument-transforming function from "
-                "signature \"%s\" for Set method for property \"%s\" "
-                "belonging to interface \"%s\"")
-            raise DPClientGenerationError(fmt_str % (signature, name,
-                                                     interface_name)) from err
+                'signature "%s" for Set method for property "%s" '
+                'belonging to interface "%s"'
+            )
+            raise DPClientGenerationError(
+                fmt_str % (signature, name, interface_name)
+            ) from err
 
         def dbus_func(proxy_object, value):  # pragma: no cover
             """
@@ -103,12 +107,13 @@ def prop_builder(interface_name, properties, timeout):
                 arg = func(value)
             except IntoDPError as err:
                 err_msg = (
-                    "Failed to format argument \"%s\" according to signature "
-                    "\"%s\" for setter method for property \"%s\" belonging to "
-                    "interface \"%s\"") % (value, signature, name,
-                                           interface_name)
-                raise DPClientMarshallingError(err_msg, interface_name,
-                                               signature, [value]) from err
+                    'Failed to format argument "%s" according to signature '
+                    '"%s" for setter method for property "%s" belonging to '
+                    'interface "%s"'
+                ) % (value, signature, name, interface_name)
+                raise DPClientMarshallingError(
+                    err_msg, interface_name, signature, [value]
+                ) from err
 
             try:
                 return proxy_object.Set(
@@ -116,14 +121,16 @@ def prop_builder(interface_name, properties, timeout):
                     name,
                     arg,
                     dbus_interface=dbus.PROPERTIES_IFACE,
-                    timeout=timeout)
+                    timeout=timeout,
+                )
             except dbus.DBusException as err:
-                err_msg = ("Error while setting value of property \"%s\" "
-                           "belonging to interface \"%s\" to value \"%s\"") % (
-                               name, interface_name, arg)
-                raise DPClientInvocationError(err_msg, interface_name,
-                                              DPClientSetPropertyContext(
-                                                  name, arg)) from err
+                err_msg = (
+                    'Error while setting value of property "%s" '
+                    'belonging to interface "%s" to value "%s"'
+                ) % (name, interface_name, arg)
+                raise DPClientInvocationError(
+                    err_msg, interface_name, DPClientSetPropertyContext(name, arg)
+                ) from err
 
         return dbus_func
 
@@ -144,7 +151,7 @@ def prop_builder(interface_name, properties, timeout):
                 """
                 Attaches getter to namespace.
                 """
-                namespace['Get'] = staticmethod(getter)
+                namespace["Get"] = staticmethod(getter)
 
         elif access == "write":
             setter = build_property_setter(name, signature)
@@ -153,7 +160,8 @@ def prop_builder(interface_name, properties, timeout):
                 """
                 Attaches setter to namespace
                 """
-                namespace['Set'] = staticmethod(setter)
+                namespace["Set"] = staticmethod(setter)
+
         else:
             getter = build_property_getter(name)
             setter = build_property_setter(name, signature)
@@ -162,8 +170,8 @@ def prop_builder(interface_name, properties, timeout):
                 """
                 Attaches getter and setter to namespace
                 """
-                namespace['Get'] = staticmethod(getter)
-                namespace['Set'] = staticmethod(setter)
+                namespace["Get"] = staticmethod(getter)
+                namespace["Set"] = staticmethod(setter)
 
         return prop_method_builder
 
@@ -189,34 +197,34 @@ def prop_builder(interface_name, properties, timeout):
         """
         for prop in properties:
             try:
-                name = prop.attrib['name']
+                name = prop.attrib["name"]
             except KeyError as err:  # pragma: no cover
-                fmt_str = ("No name attribute found for property belonging to "
-                           "interface \"%s\"")
-                raise DPClientGenerationError(
-                    fmt_str % interface_name) from err
+                fmt_str = (
+                    "No name attribute found for property belonging to "
+                    'interface "%s"'
+                )
+                raise DPClientGenerationError(fmt_str % interface_name) from err
 
             try:
-                access = prop.attrib['access']
+                access = prop.attrib["access"]
             except KeyError as err:  # pragma: no cover
-                fmt_str = ("No access attribute found for property \"%s\" "
-                           "belonging to interface \"%s\"")
-                raise DPClientGenerationError(fmt_str %
-                                              (name, interface_name)) from err
+                fmt_str = (
+                    'No access attribute found for property "%s" '
+                    'belonging to interface "%s"'
+                )
+                raise DPClientGenerationError(fmt_str % (name, interface_name)) from err
             try:
-                signature = prop.attrib['type']
+                signature = prop.attrib["type"]
             except KeyError as err:  # pragma: no cover
-                fmt_str = ("No type attribute found for property \"%s\" "
-                           "belonging to interface \"%s\"")
-                raise DPClientGenerationError(fmt_str %
-                                              (name, interface_name)) from err
+                fmt_str = (
+                    'No type attribute found for property "%s" '
+                    'belonging to interface "%s"'
+                )
+                raise DPClientGenerationError(fmt_str % (name, interface_name)) from err
 
-            namespace[name] = \
-               types.new_class(
-                   name,
-                   bases=(object,),
-                   exec_body=build_property(access, name, signature)
-               )
+            namespace[name] = types.new_class(
+                name, bases=(object,), exec_body=build_property(access, name, signature)
+            )
 
     return builder
 
@@ -255,27 +263,32 @@ def method_builder(interface_name, methods, timeout):
         try:
             arg_names = [e.attrib["name"] for e in inargs]
         except KeyError as err:  # pragma: no cover
-            fmt_str = ("No name attribute found for some argument for method "
-                       "\"%s\" belonging to interface \"%s\"")
-            raise DPClientGenerationError(fmt_str % (name,
-                                                     interface_name)) from err
+            fmt_str = (
+                "No name attribute found for some argument for method "
+                '"%s" belonging to interface "%s"'
+            )
+            raise DPClientGenerationError(fmt_str % (name, interface_name)) from err
 
         try:
             signature = "".join(e.attrib["type"] for e in inargs)
-        except KeyError as err:  #pragma: no cover
-            fmt_str = ("No type attribute found for some argument for method "
-                       "\"%s\" belonging to interface \"%s\"")
-            raise DPClientGenerationError(fmt_str % (name,
-                                                     interface_name)) from err
+        except KeyError as err:  # pragma: no cover
+            fmt_str = (
+                "No type attribute found for some argument for method "
+                '"%s" belonging to interface "%s"'
+            )
+            raise DPClientGenerationError(fmt_str % (name, interface_name)) from err
 
         try:
             func = xformer(signature)
-        except IntoDPError as err:  #pragma: no cover
-            fmt_str = ("Failed to generate argument-transforming function "
-                       "from signature \"%s\" for method \"%s\" belonging to "
-                       "interface \"%s\"")
-            raise DPClientGenerationError(fmt_str % (signature, name,
-                                                     interface_name)) from err
+        except IntoDPError as err:  # pragma: no cover
+            fmt_str = (
+                "Failed to generate argument-transforming function "
+                'from signature "%s" for method "%s" belonging to '
+                'interface "%s"'
+            )
+            raise DPClientGenerationError(
+                fmt_str % (signature, name, interface_name)
+            ) from err
         arg_names_set = frozenset(arg_names)
 
         def dbus_func(proxy_object, func_args):  # pragma: no cover
@@ -289,43 +302,52 @@ def method_builder(interface_name, methods, timeout):
             if arg_names_set != frozenset(func_args.keys()):
                 param_list = [arg for arg in arg_names_set]
                 arg_list = [arg for arg in func_args.keys()]
-                err_msg = ("Argument keywords passed (%s) did not match "
-                           "argument keywords expected (%s) for method \"%s\" "
-                           "belonging to interface \"%s\"") % (
-                               ", ".join(arg_list), ", ".join(param_list),
-                               name, interface_name)
-                raise DPClientKeywordError(err_msg, interface_name, name,
-                                           arg_list, param_list)
+                err_msg = (
+                    "Argument keywords passed (%s) did not match "
+                    'argument keywords expected (%s) for method "%s" '
+                    'belonging to interface "%s"'
+                ) % (", ".join(arg_list), ", ".join(param_list), name, interface_name)
+                raise DPClientKeywordError(
+                    err_msg, interface_name, name, arg_list, param_list
+                )
 
-            args = \
-               [v for (k, v) in \
-               sorted(func_args.items(), key=lambda x: arg_names.index(x[0]))]
+            args = [
+                v
+                for (k, v) in sorted(
+                    func_args.items(), key=lambda x: arg_names.index(x[0])
+                )
+            ]
 
             try:
                 xformed_args = func(args)
             except IntoDPError as err:
                 arg_str = ", ".join(str(arg) for arg in args)
-                err_msg = ("Failed to format arguments (%s) according to "
-                           "signature \"%s\" for method \"%s\" belonging to "
-                           "interface \"%s\"") % (arg_str, signature, name,
-                                                  interface_name)
-                raise DPClientMarshallingError(err_msg, interface_name,
-                                               signature, args) from err
+                err_msg = (
+                    "Failed to format arguments (%s) according to "
+                    'signature "%s" for method "%s" belonging to '
+                    'interface "%s"'
+                ) % (arg_str, signature, name, interface_name)
+                raise DPClientMarshallingError(
+                    err_msg, interface_name, signature, args
+                ) from err
 
             dbus_method = proxy_object.get_dbus_method(
-                name, dbus_interface=interface_name)
+                name, dbus_interface=interface_name
+            )
 
             try:
-                return dbus_method(
-                    *xformed_args, signature=signature, timeout=timeout)
+                return dbus_method(*xformed_args, signature=signature, timeout=timeout)
             except dbus.DBusException as err:
                 arg_str = ", ".join(str(arg) for arg in xformed_args)
-                err_msg = ("Error while invoking method \"%s\" belonging to "
-                           "interface \"%s\" with arguments (%s)") % (
-                               name, interface_name, arg_str)
-                raise DPClientInvocationError(err_msg, interface_name,
-                                              DPClientMethodCallContext(
-                                                  name, xformed_args)) from err
+                err_msg = (
+                    'Error while invoking method "%s" belonging to '
+                    'interface "%s" with arguments (%s)'
+                ) % (name, interface_name, arg_str)
+                raise DPClientInvocationError(
+                    err_msg,
+                    interface_name,
+                    DPClientMethodCallContext(name, xformed_args),
+                ) from err
 
         return dbus_func
 
@@ -355,15 +377,14 @@ def method_builder(interface_name, methods, timeout):
         """
         for method in methods:
             try:
-                name = method.attrib['name']
+                name = method.attrib["name"]
             except KeyError as err:  # pragma: no cover
-                fmt_str = ("No name attribute found for method belonging to "
-                           "interface \"%s\"")
-                raise DPClientGenerationError(
-                    fmt_str % interface_name) from err
+                fmt_str = (
+                    "No name attribute found for method belonging to " 'interface "%s"'
+                )
+                raise DPClientGenerationError(fmt_str % interface_name) from err
 
-            the_method = \
-               build_method(name, method.findall('./arg[@direction="in"]'))
+            the_method = build_method(name, method.findall('./arg[@direction="in"]'))
             namespace[name] = staticmethod(the_method)
 
     return builder
@@ -383,15 +404,14 @@ def make_class(name, spec, timeout=-1):
     """
 
     try:
-        interface_name = spec.attrib['name']
+        interface_name = spec.attrib["name"]
     except KeyError as err:  # pragma: no cover
-        raise DPClientGenerationError(
-            "No name attribute found for interface") from err
+        raise DPClientGenerationError("No name attribute found for interface") from err
 
-    method_builder_arg = \
-       method_builder(interface_name, spec.findall("./method"), timeout)
-    prop_builder_arg = \
-       prop_builder(interface_name, spec.findall("./property"), timeout)
+    method_builder_arg = method_builder(
+        interface_name, spec.findall("./method"), timeout
+    )
+    prop_builder_arg = prop_builder(interface_name, spec.findall("./property"), timeout)
 
     def builder(namespace):
         """
@@ -404,18 +424,12 @@ def make_class(name, spec, timeout=-1):
 
         :param namespace: the class's namespace
         """
-        namespace["Methods"] = \
-           types.new_class(
-               "Methods",
-               bases=(object,),
-               exec_body=method_builder_arg
-           )
+        namespace["Methods"] = types.new_class(
+            "Methods", bases=(object,), exec_body=method_builder_arg
+        )
 
-        namespace["Properties"] = \
-           types.new_class(
-               "Properties",
-               bases=(object,),
-               exec_body=prop_builder_arg
-           )
+        namespace["Properties"] = types.new_class(
+            "Properties", bases=(object,), exec_body=prop_builder_arg
+        )
 
-    return types.new_class(name, bases=(object, ), exec_body=builder)
+    return types.new_class(name, bases=(object,), exec_body=builder)
