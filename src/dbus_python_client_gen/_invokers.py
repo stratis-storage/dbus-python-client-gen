@@ -300,8 +300,8 @@ def method_builder(interface_name, methods, timeout):
             :raises DPClientRuntimeError:
             """
             if arg_names_set != frozenset(func_args.keys()):
-                param_list = [arg for arg in arg_names_set]
-                arg_list = [arg for arg in func_args.keys()]
+                param_list = list(arg_names_set)
+                arg_list = list(func_args.keys())
                 err_msg = (
                     "Argument keywords passed (%s) did not match "
                     'argument keywords expected (%s) for method "%s" '
