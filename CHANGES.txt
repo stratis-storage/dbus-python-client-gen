@@ -1,0 +1,24 @@
+dbus-python-client-gen 0.8.0 (UNRELEASED)
+=========================================
+Python auto-formatter: black (18.9b0)
+
+Dropped support for Python 2
+
+- Pass signature argument in D-Bus method call:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/34
+
+- Tidies and Maintenance:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/40
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/37
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/33
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/32
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/31
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/27
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/24
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/23
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/21
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/20
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/19
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/18
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/17
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/16
