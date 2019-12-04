@@ -5,6 +5,7 @@
 Exception hierarchy for this package.
 """
 
+# isort: STDLIB
 from abc import ABC
 
 # Put this pylint directive at module level. There's a slight bug in pylint

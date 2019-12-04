@@ -2,16 +2,15 @@
 Test generation of class for invoking dbus methods.
 """
 
+# isort: STDLIB
 import os
 import types
 import unittest
-
 import xml.etree.ElementTree as ET
 
+# isort: LOCAL
 from dbus_python_client_gen import make_class
-
-from dbus_python_client_gen._invokers import method_builder
-from dbus_python_client_gen._invokers import prop_builder
+from dbus_python_client_gen._invokers import method_builder, prop_builder
 
 
 class TestCase(unittest.TestCase):
