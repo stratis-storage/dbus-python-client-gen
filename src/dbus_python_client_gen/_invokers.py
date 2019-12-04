@@ -4,20 +4,24 @@
 """
 Code for generating classes suitable for invoking dbus-python methods.
 """
+# isort: STDLIB
 import types
+
+# isort: THIRDPARTY
 import dbus
 
-from into_dbus_python import IntoDPError
-from into_dbus_python import xformer
-from into_dbus_python import xformers
+# isort: FIRSTPARTY
+from into_dbus_python import IntoDPError, xformer, xformers
 
-from ._errors import DPClientGenerationError
-from ._errors import DPClientGetPropertyContext
-from ._errors import DPClientInvocationError
-from ._errors import DPClientKeywordError
-from ._errors import DPClientMarshallingError
-from ._errors import DPClientMethodCallContext
-from ._errors import DPClientSetPropertyContext
+from ._errors import (
+    DPClientGenerationError,
+    DPClientGetPropertyContext,
+    DPClientInvocationError,
+    DPClientKeywordError,
+    DPClientMarshallingError,
+    DPClientMethodCallContext,
+    DPClientSetPropertyContext,
+)
 
 
 def prop_builder(interface_name, properties, timeout):
