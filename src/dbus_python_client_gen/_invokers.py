@@ -384,7 +384,7 @@ def method_builder(interface_name, methods, timeout):
                 name = method.attrib["name"]
             except KeyError as err:  # pragma: no cover
                 fmt_str = (
-                    "No name attribute found for method belonging to " 'interface "%s"'
+                    'No name attribute found for method belonging to interface "%s"'
                 )
                 raise DPClientGenerationError(fmt_str % interface_name) from err
 
