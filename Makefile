@@ -34,3 +34,7 @@ view:
 	PYTHONPATH=src pyreverse ${PYREVERSE_OPTS} --project="dbus-python-client-gen" src/dbus_python_client_gen
 	mv classes_dbus-python-client-gen.pdf _pyreverse
 	mv packages_dbus-python-client-gen.pdf _pyreverse
+
+.PHONY: yamllint
+yamllint:
+	yamllint --strict .travis.yml
