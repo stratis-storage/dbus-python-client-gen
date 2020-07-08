@@ -21,9 +21,9 @@ jobs:
   include:
 
     # VERIFICATION OF TEST INFRASTRUCTURE
-    - name: "run yamllint on .travis.yml"
+    - name: "run yamllint 1.23.0 on .travis.yml"
       python: "3.7.6"
-      install: pip install yamllint
+      install: pip install yamllint==1.23.0
       env: TASK=yamllint
 
 script: make -f Makefile $TASK
