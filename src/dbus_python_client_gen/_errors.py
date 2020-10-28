@@ -98,7 +98,7 @@ class DPClientRuntimeError(DPClientError):
         :param str message: the error message
         :param str interface_name: the name of the interface
         """
-        super(DPClientRuntimeError, self).__init__(message)
+        super().__init__(message)
         self.interface_name = interface_name
 
 
@@ -115,7 +115,7 @@ class DPClientInvocationError(DPClientRuntimeError):
         :param str interface_name: the interface name
         :param InvocationContext context: invocation context
         """
-        super(DPClientInvocationError, self).__init__(message, interface_name)
+        super().__init__(message, interface_name)
         self.context = context
 
 
@@ -131,12 +131,7 @@ class DPClientMarshallingError(DPClientInvalidArgError):
     """
 
     def __init__(
-        # pylint: disable=bad-continuation
-        self,
-        message,
-        interface_name,
-        signature,
-        arguments,
+        self, message, interface_name, signature, arguments,
     ):  # pragma: no cover
         """
         Initialize a DPClientMarshallingError with the arguments that failed.
@@ -148,7 +143,7 @@ class DPClientMarshallingError(DPClientInvalidArgError):
         :param str signature: the D-Bus signature for the arguments
         :param arguments: list of object
         """
-        super(DPClientMarshallingError, self).__init__(message, interface_name)
+        super().__init__(message, interface_name)
         self.signature = signature
         self.arguments = arguments
 
@@ -159,13 +154,7 @@ class DPClientKeywordError(DPClientInvalidArgError):
     """
 
     def __init__(
-        # pylint: disable=bad-continuation
-        self,
-        message,
-        interface_name,
-        method_name,
-        expected,
-        actual,
+        self, message, interface_name, method_name, expected, actual,
     ):  # pragma: no cover
         # pylint: disable=too-many-arguments
         """
@@ -179,7 +168,7 @@ class DPClientKeywordError(DPClientInvalidArgError):
         :param actual: the actual keywords
         :type actual: list of str
         """
-        super(DPClientKeywordError, self).__init__(message, interface_name)
+        super().__init__(message, interface_name)
         self.method_name = method_name
         self.expected = expected
         self.actual = actual
