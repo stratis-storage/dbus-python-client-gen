@@ -90,7 +90,7 @@ def prop_builder(interface_name, properties, timeout):
         :param str signature: the signature of the property
         """
         try:
-            func = xformers(signature)[0]
+            func = xformers(signature)[0][0]
         except IntoDPError as err:  # pragma: no cover
             fmt_str = (
                 "Failed to generate argument-transforming function from "
