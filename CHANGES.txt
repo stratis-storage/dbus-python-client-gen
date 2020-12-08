@@ -1,14 +1,37 @@
 dbus-python-client-gen 0.8.0 (UNRELEASED)
 =========================================
-Python auto-formatter: black (18.9b0)
+
+Recommended Python interpreter: 3.7.9
+Recommended tox version: 3.13.2
+Python auto-formatter: black (19.10b0)
+Python import sorter: isort (4.3.21)
+YANL linter: yamllint (1.23.0)
 
 Dropped support for Python 2
+
+New dependency version requirement:
+  * into-dbus-python >= 0.8
+
+- Fix two bugs in generation of property setter methods:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/53
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/36
 
 - Pass signature argument in D-Bus method call:
   https://github.com/stratis-storage/dbus-python-client-gen/pull/34
 
 - Tidies and Maintenance:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/54
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/52
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/50
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/48
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/47
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/45
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/44
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/43
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/42
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/41
   https://github.com/stratis-storage/dbus-python-client-gen/pull/40
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/39
   https://github.com/stratis-storage/dbus-python-client-gen/pull/37
   https://github.com/stratis-storage/dbus-python-client-gen/pull/33
   https://github.com/stratis-storage/dbus-python-client-gen/pull/32
