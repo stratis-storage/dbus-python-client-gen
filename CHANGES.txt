@@ -1,5 +1,5 @@
-dbus-python-client-gen 0.8.0 (UNRELEASED)
-=========================================
+dbus-python-client-gen 0.8.0
+============================
 
 Recommended Python interpreter: 3.7.9
 Recommended tox version: 3.13.2
