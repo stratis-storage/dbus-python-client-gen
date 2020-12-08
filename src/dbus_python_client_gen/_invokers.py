@@ -108,7 +108,7 @@ def prop_builder(interface_name, properties, timeout):
             :raises DPClientRuntimeError:
             """
             try:
-                arg = func(value)
+                arg = func(value, variant=1)
             except IntoDPError as err:
                 err_msg = (
                     'Failed to format argument "%s" according to signature '
