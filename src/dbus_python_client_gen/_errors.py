@@ -131,7 +131,11 @@ class DPClientMarshallingError(DPClientInvalidArgError):
     """
 
     def __init__(
-        self, message, interface_name, signature, arguments,
+        self,
+        message,
+        interface_name,
+        signature,
+        arguments,
     ):  # pragma: no cover
         """
         Initialize a DPClientMarshallingError with the arguments that failed.
@@ -154,7 +158,12 @@ class DPClientKeywordError(DPClientInvalidArgError):
     """
 
     def __init__(
-        self, message, interface_name, method_name, expected, actual,
+        self,
+        message,
+        interface_name,
+        method_name,
+        expected,
+        actual,
     ):  # pragma: no cover
         # pylint: disable=too-many-arguments
         """
