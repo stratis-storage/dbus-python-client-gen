@@ -2,12 +2,12 @@ TOX=tox
 
 .PHONY: fmt
 fmt:
-	isort --recursive setup.py src tests
+	isort setup.py src tests
 	black .
 
 .PHONY: fmt-travis
 fmt-travis:
-	isort --recursive --diff --check-only setup.py src tests
+	isort --diff --check-only setup.py src tests
 	black . --check
 
 .PHONY: lint
