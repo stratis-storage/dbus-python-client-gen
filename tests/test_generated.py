@@ -24,13 +24,13 @@ class TestCase(unittest.TestCase):
         """
         Read introspection data.
         """
-        self._data = dict()
+        self._data = {}
         datadir = os.path.join(self._DIRNAME, "data")
         for name in os.listdir(datadir):
             if name[-4:] != ".xml":
                 continue
             path = os.path.join(datadir, name)
-            with open(path) as opath:
+            with open(path, encoding="utf-8") as opath:
                 self._data[name] = ET.fromstring("".join(opath.readlines()))
 
     def _test_property(self, klass, prop):
