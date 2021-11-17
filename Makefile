@@ -12,7 +12,9 @@ fmt-travis:
 
 .PHONY: lint
 lint:
-	$(TOX) -c tox.ini -e lint
+	pylint setup.py
+	pylint src/dbus_python_client_gen
+	pylint tests
 
 .PHONY: coverage
 coverage:
