@@ -18,7 +18,9 @@ lint:
 
 .PHONY: coverage
 coverage:
-	$(TOX) -c tox.ini -e coverage
+	coverage --version
+	coverage run --timid --branch -m unittest discover tests
+	coverage report -m --fail-under=100 --show-missing --include="./src/*"
 
 .PHONY: test
 test:
