@@ -73,9 +73,9 @@ def prop_builder(interface_name, properties, timeout):
                 )
             except dbus.DBusException as err:
                 err_msg = (
-                    'Error while getting value for property "%s" '
-                    'belonging to interface "%s"'
-                ) % (name, interface_name)
+                    f'Error while getting value for property "{name}" '
+                    f'belonging to interface "{interface_name}"'
+                )
                 raise DPClientInvocationError(
                     err_msg, interface_name, DPClientGetPropertyContext(name)
                 ) from err
@@ -111,10 +111,10 @@ def prop_builder(interface_name, properties, timeout):
                 arg = func(value, variant=1)
             except IntoDPError as err:
                 err_msg = (
-                    'Failed to format argument "%s" according to signature '
-                    '"%s" for setter method for property "%s" belonging to '
-                    'interface "%s"'
-                ) % (value, signature, name, interface_name)
+                    f'Failed to format argument "{value}" according to signature '
+                    f'"{signature}" for setter method for property "{name}" belonging to '
+                    f'interface "{interface_name}"'
+                )
                 raise DPClientMarshallingError(
                     err_msg, interface_name, signature, [value]
                 ) from err
@@ -129,9 +129,9 @@ def prop_builder(interface_name, properties, timeout):
                 )
             except dbus.DBusException as err:
                 err_msg = (
-                    'Error while setting value of property "%s" '
-                    'belonging to interface "%s" to value "%s"'
-                ) % (name, interface_name, arg)
+                    f'Error while setting value of property "{name}" '
+                    f'belonging to interface "{interface_name}" to value "{arg}"'
+                )
                 raise DPClientInvocationError(
                     err_msg, interface_name, DPClientSetPropertyContext(name, arg)
                 ) from err
@@ -307,10 +307,11 @@ def method_builder(interface_name, methods, timeout):
                 param_list = list(arg_names_set)
                 arg_list = list(func_args.keys())
                 err_msg = (
-                    "Argument keywords passed (%s) did not match "
-                    'argument keywords expected (%s) for method "%s" '
-                    'belonging to interface "%s"'
-                ) % (", ".join(arg_list), ", ".join(param_list), name, interface_name)
+                    f"Argument keywords passed ({', '.join(arg_list)}) did not match "
+                    f"argument keywords expected ({', '.join(param_list)}) "
+                    f'for method "{name}" '
+                    f'belonging to interface "{interface_name}"',
+                )
                 raise DPClientKeywordError(
                     err_msg, interface_name, name, arg_list, param_list
                 )
@@ -327,10 +328,10 @@ def method_builder(interface_name, methods, timeout):
             except IntoDPError as err:
                 arg_str = ", ".join(str(arg) for arg in args)
                 err_msg = (
-                    "Failed to format arguments (%s) according to "
-                    'signature "%s" for method "%s" belonging to '
-                    'interface "%s"'
-                ) % (arg_str, signature, name, interface_name)
+                    f"Failed to format arguments ({arg_str}) according to "
+                    f'signature "{signature}" for method "{name}" belonging to '
+                    f'interface "{interface_name}"'
+                )
                 raise DPClientMarshallingError(
                     err_msg, interface_name, signature, args
                 ) from err
@@ -344,9 +345,9 @@ def method_builder(interface_name, methods, timeout):
             except dbus.DBusException as err:
                 arg_str = ", ".join(str(arg) for arg in xformed_args)
                 err_msg = (
-                    'Error while invoking method "%s" belonging to '
-                    'interface "%s" with arguments (%s)'
-                ) % (name, interface_name, arg_str)
+                    f'Error while invoking method "{name}" belonging to '
+                    f'interface "{interface_name}" with arguments ({arg_str})'
+                )
                 raise DPClientInvocationError(
                     err_msg,
                     interface_name,
