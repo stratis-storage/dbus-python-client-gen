@@ -130,7 +130,7 @@ def prop_builder(interface_name, properties, timeout):
             except dbus.DBusException as err:
                 err_msg = (
                     f'Error while setting value of property "{name}" '
-                    f'belonging to interface "{interface_name}" to value "{arg}"'
+                    f'belonging to interface "{interface_name}" to value "{arg!r}"'
                 )
                 raise DPClientInvocationError(
                     err_msg, interface_name, DPClientSetPropertyContext(name, arg)
@@ -343,7 +343,7 @@ def method_builder(interface_name, methods, timeout):
             try:
                 return dbus_method(*xformed_args, signature=signature, timeout=timeout)
             except dbus.DBusException as err:
-                arg_str = ", ".join(str(arg) for arg in xformed_args)
+                arg_str = ", ".join(repr(arg) for arg in xformed_args)
                 err_msg = (
                     f'Error while invoking method "{name}" belonging to '
                     f'interface "{interface_name}" with arguments ({arg_str})'
