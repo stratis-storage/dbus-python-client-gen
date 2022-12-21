@@ -1,5 +1,3 @@
-TOX=tox
-
 .PHONY: fmt
 fmt:
 	isort setup.py src tests
@@ -16,15 +14,15 @@ lint:
 	pylint src/dbus_python_client_gen
 	pylint tests
 
+.PHONY: test
+test:
+	python3 -m unittest discover tests	
+
 .PHONY: coverage
 coverage:
 	coverage --version
 	coverage run --timid --branch -m unittest discover tests
 	coverage report -m --fail-under=100 --show-missing --include="./src/*"
-
-.PHONY: test
-test:
-	$(TOX) -c tox.ini -e test
 
 .PHONY: upload-release
 upload-release:
