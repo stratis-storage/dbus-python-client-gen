@@ -12,25 +12,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # MANDATORY CHECKS THAT USE TOX
-  tox-checks:
-    strategy:
-      matrix:
-        task: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9.9
-      - name: Install dependencies
-        run: |
-          sudo apt-get -q update
-          sudo apt-get -y install libdbus-glib-1-dev
-          pip3 install tox==3.24.1
-      - name: Run test
-        run: make -f Makefile ${{ matrix.task }}
-
   development_environment_checks:
     strategy:
       matrix:
@@ -41,6 +22,8 @@ jobs:
             task: make -f Makefile yamllint
           - dependencies: pylint python3-into-dbus-python
             task: PYTHONPATH=./src make -f Makefile lint
+          - dependencies: python3-into-dbus-python
+            task: PYTHONPATH=./src make -f Makefile test
           - dependencies: python3-coverage python3-into-dbus-python
             task: PYTHONPATH=./src make -f Makefile coverage
     runs-on: ubuntu-latest
