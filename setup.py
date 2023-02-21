@@ -30,11 +30,11 @@ setuptools.setup(
     description="transforms values into properly wrapped dbus-python objects",
     long_description=long_description,
     platforms=["Linux"],
-    license="Apache 2.0",
+    license="MPL-2.0",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
