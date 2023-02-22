@@ -29,6 +29,7 @@ setuptools.setup(
     author_email="amulhern@redhat.com",
     description="transforms values into properly wrapped dbus-python objects",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     platforms=["Linux"],
     license="MPL-2.0",
     classifiers=[
