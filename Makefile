@@ -24,10 +24,6 @@ coverage:
 	coverage run --timid --branch -m unittest discover tests
 	coverage report -m --fail-under=100 --show-missing --include="./src/*"
 
-.PHONY: upload-release
-upload-release:
-	python setup.py register sdist upload
-
 PYREVERSE_OPTS = --output=pdf
 .PHONY: view
 view:
@@ -40,3 +36,7 @@ view:
 .PHONY: yamllint
 yamllint:
 	yamllint --strict .github/workflows/main.yml 
+
+.PHONY: package
+package:
+	(umask 0022; python -m build; python -m twine check --strict ./dist/*)
