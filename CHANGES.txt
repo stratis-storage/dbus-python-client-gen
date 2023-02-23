@@ -1,3 +1,37 @@
+dbus-python-client-gen 0.8.1
+============================
+Recommended development environment: Fedora 37
+
+- Tidies and Maintenance:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/85
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/84
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/83
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/82
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/81
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/80
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/78
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/77
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/76
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/75
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/74
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/73
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/72
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/70
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/69
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/68
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/67
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/66
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/65
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/64
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/63
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/62
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/61
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/60
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/59
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/58
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/57
+
+
 dbus-python-client-gen 0.8.0
 ============================
 
