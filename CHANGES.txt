@@ -1,3 +1,19 @@
+dbus-python-client-gen 0.8.3
+============================
+Recommended development environment: Fedora 38
+
+- Simplifyy setup.cfg:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/93
+
+- Make __version__ available directly from package import:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/92
+
+- Tidies and Maintenance:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/91
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/90
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/88
+
+
 dbus-python-client-gen 0.8.2
 ============================
 Recommended development environment: Fedora 37
