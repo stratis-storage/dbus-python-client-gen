@@ -19,3 +19,4 @@ from ._errors import (
     DPClientSetPropertyContext,
 )
 from ._invokers import make_class
+from ._version import __version__
