@@ -6,10 +6,16 @@ Test generation of class for invoking dbus methods.
 import unittest
 import xml.etree.ElementTree as ET
 
-# isort: LOCAL
-from dbus_python_client_gen import DPClientGenerationError, make_class
-
+# isort: FIRSTPARTY
 from tests._introspect import SPECS
+
+# isort: LOCAL
+from dbus_python_client_gen import (
+    DPClientGenerationError,
+    DPClientKeywordError,
+    DPClientMarshallingError,
+    make_class,
+)
 
 try:
     interfaces = list(SPECS)
@@ -47,11 +53,28 @@ class TestCase(unittest.TestCase):
         prop_klass = getattr(klass, name)
         if "read" in access:
             self.assertTrue(hasattr(prop_klass, "Get"))
+
+            with self.assertRaises(AttributeError):
+                getattr(prop_klass, "Get")(None)
+
         if "write" in access:
             self.assertTrue(hasattr(prop_klass, "Set"))
+
+            if name == "Overprovisioning":
+                # Overprovisioning takes a boolean argument and almost
+                # every Python object can be interpreted as a boolean.
+                # Could be considered to be a minor bug in into-dbus-python.
+                pass
+            else:
+                with self.assertRaises(DPClientMarshallingError):
+                    getattr(prop_klass, "Set")(None, None)
+
         if "readwrite" in access:
             self.assertTrue(hasattr(prop_klass, "Get"))
             self.assertTrue(hasattr(prop_klass, "Set"))
+
+            with self.assertRaises(AttributeError):
+                getattr(prop_klass, "Get")(None)
 
     def _test_method(self, klass, method):
         """
@@ -63,6 +86,10 @@ class TestCase(unittest.TestCase):
         """
         name = method.attrib["name"]
         self.assertTrue(hasattr(klass, name))
+
+        method = getattr(klass, name)
+        with self.assertRaises(DPClientKeywordError):
+            method(None, {"bogus_keyword": None})
 
     def _test_klasses(self):
         """
