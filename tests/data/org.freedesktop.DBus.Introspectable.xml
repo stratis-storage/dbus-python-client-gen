@@ -1,5 +1,0 @@
-<interface name="org.freedesktop.DBus.Introspectable">
-<method name="Introspect">
-<arg name="xml_data" type="s" direction="out"/>
-</method>
-</interface>

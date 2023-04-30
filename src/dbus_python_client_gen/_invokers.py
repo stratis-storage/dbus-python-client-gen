@@ -157,7 +157,7 @@ def prop_builder(interface_name, properties, timeout):
                 """
                 namespace["Get"] = staticmethod(getter)
 
-        elif access == "write":
+        elif access == "write":  # pragma: no cover
             setter = build_property_setter(name, signature)
 
             def prop_method_builder(namespace):
