@@ -89,7 +89,7 @@ class DPClientRuntimeError(DPClientError):
     Exception raised during execution of generated classes.
     """
 
-    def __init__(self, message, interface_name):  # pragma: no cover
+    def __init__(self, message, interface_name):
         """
         Initialize a DPClientRuntimeError with an interface name.
         All DPClientRuntimeErrors are guaranteed to have an interface name;
@@ -136,7 +136,7 @@ class DPClientMarshallingError(DPClientInvalidArgError):
         interface_name,
         signature,
         arguments,
-    ):  # pragma: no cover
+    ):
         """
         Initialize a DPClientMarshallingError with the arguments that failed.
         All DPClientMarshallingErrors are guaranteed to have a non-empty list
@@ -164,8 +164,7 @@ class DPClientKeywordError(DPClientInvalidArgError):
         method_name,
         expected,
         actual,
-    ):  # pragma: no cover
-        # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments
         """
         Initialize a DPClientKeywordError with the mismatched arguments.
 

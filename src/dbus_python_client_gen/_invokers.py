@@ -58,7 +58,7 @@ def prop_builder(interface_name, properties, timeout):
         :param str name: the name of the property
         """
 
-        def dbus_func(proxy_object):  # pragma: no cover
+        def dbus_func(proxy_object):
             """
             The property getter.
 
@@ -71,7 +71,7 @@ def prop_builder(interface_name, properties, timeout):
                     dbus_interface=dbus.PROPERTIES_IFACE,
                     timeout=timeout,
                 )
-            except dbus.DBusException as err:
+            except dbus.DBusException as err:  # pragma: no cover
                 err_msg = (
                     f'Error while getting value for property "{name}" '
                     f'belonging to interface "{interface_name}"'
@@ -101,7 +101,7 @@ def prop_builder(interface_name, properties, timeout):
                 fmt_str % (signature, name, interface_name)
             ) from err
 
-        def dbus_func(proxy_object, value):  # pragma: no cover
+        def dbus_func(proxy_object, value):
             """
             The property setter.
 
@@ -119,7 +119,7 @@ def prop_builder(interface_name, properties, timeout):
                     err_msg, interface_name, signature, [value]
                 ) from err
 
-            try:
+            try:  # pragma: no cover
                 return proxy_object.Set(
                     interface_name,
                     name,
@@ -127,7 +127,7 @@ def prop_builder(interface_name, properties, timeout):
                     dbus_interface=dbus.PROPERTIES_IFACE,
                     timeout=timeout,
                 )
-            except dbus.DBusException as err:
+            except dbus.DBusException as err:  # pragma: no cover
                 err_msg = (
                     f'Error while setting value of property "{name}" '
                     f'belonging to interface "{interface_name}" to value "{arg!r}"'
@@ -157,7 +157,7 @@ def prop_builder(interface_name, properties, timeout):
                 """
                 namespace["Get"] = staticmethod(getter)
 
-        elif access == "write":
+        elif access == "write":  # pragma: no cover
             setter = build_property_setter(name, signature)
 
             def prop_method_builder(namespace):
@@ -295,7 +295,7 @@ def method_builder(interface_name, methods, timeout):
             ) from err
         arg_names_set = frozenset(arg_names)
 
-        def dbus_func(proxy_object, func_args):  # pragma: no cover
+        def dbus_func(proxy_object, func_args):
             """
             The method proper.
 
@@ -321,11 +321,11 @@ def method_builder(interface_name, methods, timeout):
                 for (k, v) in sorted(
                     func_args.items(), key=lambda x: arg_names.index(x[0])
                 )
-            ]
+            ]  # pragma: no cover
 
-            try:
+            try:  # pragma: no cover
                 xformed_args = func(args)
-            except IntoDPError as err:
+            except IntoDPError as err:  # pragma: no cover
                 arg_str = ", ".join(str(arg) for arg in args)
                 err_msg = (
                     f"Failed to format arguments ({arg_str}) according to "
@@ -338,11 +338,11 @@ def method_builder(interface_name, methods, timeout):
 
             dbus_method = proxy_object.get_dbus_method(
                 name, dbus_interface=interface_name
-            )
+            )  # pragma: no cover
 
-            try:
+            try:  # pragma: no cover
                 return dbus_method(*xformed_args, signature=signature, timeout=timeout)
-            except dbus.DBusException as err:
+            except dbus.DBusException as err:  # pragma: no cover
                 arg_str = ", ".join(repr(arg) for arg in xformed_args)
                 err_msg = (
                     f'Error while invoking method "{name}" belonging to '

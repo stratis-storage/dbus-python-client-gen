@@ -3,35 +3,41 @@ Test generation of class for invoking dbus methods.
 """
 
 # isort: STDLIB
-import os
-import types
 import unittest
 import xml.etree.ElementTree as ET
 
+# isort: FIRSTPARTY
+from tests._introspect import SPECS
+
 # isort: LOCAL
-from dbus_python_client_gen import make_class
-from dbus_python_client_gen._invokers import method_builder, prop_builder
+from dbus_python_client_gen import (
+    DPClientGenerationError,
+    DPClientKeywordError,
+    DPClientMarshallingError,
+    make_class,
+)
+
+try:
+    interfaces = list(SPECS)
+
+    TIMEOUT = 120000
+
+    klasses = {}
+    for key, value in SPECS.items():
+        xml_spec = ET.fromstring(value)
+        klass_def = make_class(key.split(".")[-2], xml_spec, TIMEOUT)
+        klasses[key] = (xml_spec, klass_def)
+
+except DPClientGenerationError as err:
+    raise RuntimeError(
+        "Failed to generate some class needed for invoking dbus-python methods"
+    ) from err
 
 
 class TestCase(unittest.TestCase):
     """
     Test the behavior of various auto-generated classes
     """
-
-    _DIRNAME = os.path.dirname(__file__)
-
-    def setUp(self):
-        """
-        Read introspection data.
-        """
-        self._data = {}
-        datadir = os.path.join(self._DIRNAME, "data")
-        for name in os.listdir(datadir):
-            if name[-4:] != ".xml":
-                continue
-            path = os.path.join(datadir, name)
-            with open(path, encoding="utf-8") as opath:
-                self._data[name] = ET.fromstring("".join(opath.readlines()))
 
     def _test_property(self, klass, prop):
         """
@@ -47,19 +53,28 @@ class TestCase(unittest.TestCase):
         prop_klass = getattr(klass, name)
         if "read" in access:
             self.assertTrue(hasattr(prop_klass, "Get"))
+
+            with self.assertRaises(AttributeError):
+                getattr(prop_klass, "Get")(None)
+
         if "write" in access:
             self.assertTrue(hasattr(prop_klass, "Set"))
 
-    def _test_properties(self):
-        """
-        Generate a klass from an interface spec and verify that it has
-        the properties it should have.
-        """
-        for name, spec in self._data.items():
-            builder = prop_builder(name, spec.findall("./property"), -1)
-            klass = types.new_class(name, bases=(object,), exec_body=builder)
-            for prop in spec.findall("./property"):
-                self._test_property(klass, prop)
+            if name == "Overprovisioning":
+                # Overprovisioning takes a boolean argument and almost
+                # every Python object can be interpreted as a boolean.
+                # Could be considered to be a minor bug in into-dbus-python.
+                pass
+            else:
+                with self.assertRaises(DPClientMarshallingError):
+                    getattr(prop_klass, "Set")(None, None)
+
+        if "readwrite" in access:
+            self.assertTrue(hasattr(prop_klass, "Get"))
+            self.assertTrue(hasattr(prop_klass, "Set"))
+
+            with self.assertRaises(AttributeError):
+                getattr(prop_klass, "Get")(None)
 
     def _test_method(self, klass, method):
         """
@@ -72,28 +87,21 @@ class TestCase(unittest.TestCase):
         name = method.attrib["name"]
         self.assertTrue(hasattr(klass, name))
 
-    def _test_methods(self):
-        """
-        Generate a class from an interface spec and verify that it has
-        the properties it should have.
-        """
-        for name, spec in self._data.items():
-            builder = method_builder(name, spec.findall("./method"), -1)
-            klass = types.new_class(name, bases=(object,), exec_body=builder)
-            for method in spec.findall("./method"):
-                self._test_method(klass, method)
+        method = getattr(klass, name)
+        with self.assertRaises(DPClientKeywordError):
+            method(None, {"bogus_keyword": None})
 
-    def _test_klass(self):
+    def _test_klasses(self):
         """
-        Generate a class from an interface spec and verify that it has two
-        fields, "Properties" and "Methods".
+        Test the standard classes specified.
         """
-        for name, spec in self._data.items():
-            klass = make_class(name, spec)
+        for (_, (spec, klass)) in klasses.items():
             self.assertTrue(hasattr(klass, "Properties"))
-            properties = getattr(klass, "Properties")
             self.assertTrue(hasattr(klass, "Methods"))
+
+            properties = getattr(klass, "Properties")
             methods = getattr(klass, "Methods")
+
             for method in spec.findall("./method"):
                 self._test_method(methods, method)
 
@@ -104,6 +112,4 @@ class TestCase(unittest.TestCase):
         """
         Test properties and methods of all specs available.
         """
-        self._test_properties()
-        self._test_methods()
-        self._test_klass()
+        self._test_klasses()

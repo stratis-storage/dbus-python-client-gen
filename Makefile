@@ -12,7 +12,7 @@ fmt-travis:
 lint:
 	pylint setup.py
 	pylint src/dbus_python_client_gen
-	pylint tests
+	pylint tests --ignore=_introspect.py
 
 .PHONY: test
 test:
