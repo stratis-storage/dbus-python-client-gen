@@ -37,3 +37,23 @@ jobs:
           ${{ matrix.dependencies }}
       - name: ${{ matrix.task }}
         run: ${{ matrix.task }}
+
+  lowest_environment_checks:
+    strategy:
+      matrix:
+        include:
+          - dependencies: pylint python3-into-dbus-python
+            task: PYTHONPATH=./src make -f Makefile lint
+          - dependencies: python3-into-dbus-python
+            task: PYTHONPATH=./src make -f Makefile test
+    runs-on: ubuntu-latest
+    container: fedora:34  # LOWEST DEVELOPMENT ENVIRONMENT
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: >
+          dnf install -y
+          make
+          ${{ matrix.dependencies }}
+      - name: ${{ matrix.task }}
+        run: ${{ matrix.task }}
