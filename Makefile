@@ -40,3 +40,8 @@ yamllint:
 .PHONY: package
 package:
 	(umask 0022; python -m build; python -m twine check --strict ./dist/*)
+
+.PHONY: legacy-package
+legacy-package:
+	python3 setup.py build
+	python3 setup.py install
