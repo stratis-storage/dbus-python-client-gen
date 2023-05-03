@@ -46,6 +46,8 @@ jobs:
             task: PYTHONPATH=./src make -f Makefile lint
           - dependencies: python3-into-dbus-python
             task: PYTHONPATH=./src make -f Makefile test
+          - dependencies: python-setuptools python3-into-dbus-python
+            task: make legacy-package
     runs-on: ubuntu-latest
     container: fedora:34  # LOWEST DEVELOPMENT ENVIRONMENT
     steps:
