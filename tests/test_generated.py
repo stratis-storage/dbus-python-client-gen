@@ -95,7 +95,7 @@ class TestCase(unittest.TestCase):
         """
         Test the standard classes specified.
         """
-        for (_, (spec, klass)) in klasses.items():
+        for _, (spec, klass) in klasses.items():
             self.assertTrue(hasattr(klass, "Properties"))
             self.assertTrue(hasattr(klass, "Methods"))
 
