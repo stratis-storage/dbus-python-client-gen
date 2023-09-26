@@ -56,7 +56,7 @@ generation or when the methods of the class are executed.
 
 The following shows the error hierarchy. Entries after the dash indicate
 additional fields, beyond the message, which the exception contains. Only
-leaves of the error class heirarchy are constructed directly.
+leaves of the error class hierarchy are constructed directly.
 
 
 DPClientError
