@@ -20,11 +20,14 @@ jobs:
             task: make -f Makefile fmt-travis
           - dependencies: yamllint
             task: make -f Makefile yamllint
-          - dependencies: pylint python3-into-dbus-python
+          - dependencies: pylint python3-into-dbus-python python3-setuptools
             task: PYTHONPATH=./src make -f Makefile lint
-          - dependencies: python3-into-dbus-python
+          - dependencies: python3-into-dbus-python python3-setuptools
             task: PYTHONPATH=./src make -f Makefile test
-          - dependencies: python3-coverage python3-into-dbus-python
+          - dependencies: >
+              python3-coverage
+              python3-into-dbus-python
+              python3-setuptools
             task: PYTHONPATH=./src make -f Makefile coverage
     runs-on: ubuntu-latest
     container: fedora:40  # CURRENT DEVELOPMENT ENVIRONMENT
