@@ -164,7 +164,7 @@ class DPClientKeywordError(DPClientInvalidArgError):
         method_name,
         expected,
         actual,
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments, too-many-positional-arguments
         """
         Initialize a DPClientKeywordError with the mismatched arguments.
 
