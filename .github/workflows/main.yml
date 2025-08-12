@@ -41,7 +41,7 @@ jobs:
       - name: ${{ matrix.task }}
         run: ${{ matrix.task }}
 
-  lowest_environment_checks:
+  lowest_supported_python:
     strategy:
       matrix:
         include:
@@ -50,8 +50,20 @@ jobs:
           - dependencies: python-setuptools python3-into-dbus-python
             task: make legacy-package
     runs-on: ubuntu-latest
-    container: fedora:35  # LOWEST DEVELOPMENT ENVIRONMENT
+    container: fedora:41  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:
+      - name: Install python3.12
+        run: >
+          dnf install -y
+          alternatives
+          python3.12
+      - name: Set python3 to python3.12
+        run: >
+          alternatives
+          --install /usr/bin/python3
+          python3
+          /usr/bin/python3.12
+          10
       - name: Display Python version
         run: python3 --version
       - uses: actions/checkout@v4
