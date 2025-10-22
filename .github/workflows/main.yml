@@ -30,7 +30,7 @@ jobs:
               python3-setuptools
             task: PYTHONPATH=./src make -f Makefile coverage
     runs-on: ubuntu-latest
-    container: fedora:41  # CURRENT DEVELOPMENT ENVIRONMENT
+    container: fedora:42  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:
       - uses: actions/checkout@v5
         with:
@@ -50,7 +50,7 @@ jobs:
           - dependencies: python3-into-dbus-python
             task: PYTHONPATH=./src make -f Makefile test
     runs-on: ubuntu-latest
-    container: fedora:41  # CURRENT DEVELOPMENT ENVIRONMENT
+    container: fedora:42  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:
       - name: Install python3.12
         run: >
