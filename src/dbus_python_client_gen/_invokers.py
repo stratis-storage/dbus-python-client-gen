@@ -6,9 +6,12 @@ Code for generating classes suitable for invoking dbus-python methods.
 """
 # isort: STDLIB
 import types
+import xml.etree.ElementTree as ET  # nosec B405
+from typing import Any, Callable, Mapping, MutableMapping, Sequence, Type
 
 # isort: THIRDPARTY
 import dbus
+from dbus.proxies import ProxyObject
 
 # isort: FIRSTPARTY
 from into_dbus_python import IntoDPError, xformer, xformers
@@ -24,7 +27,9 @@ from ._errors import (
 )
 
 
-def prop_builder(interface_name, properties, timeout):
+def prop_builder(
+    interface_name: str, properties: Sequence[ET.Element], timeout: int
+) -> Callable[[MutableMapping[str, Type]], None]:
     """
     Returns a function that builds a property interface based on arguments.
 
@@ -51,14 +56,14 @@ def prop_builder(interface_name, properties, timeout):
     :raises DPClientGenerationError:
     """
 
-    def build_property_getter(name):
+    def build_property_getter(name: str) -> Callable[[ProxyObject], Any]:
         """
         Build a single property getter for this class.
 
         :param str name: the name of the property
         """
 
-        def dbus_func(proxy_object):
+        def dbus_func(proxy_object: ProxyObject) -> Any:
             """
             The property getter.
 
@@ -82,7 +87,9 @@ def prop_builder(interface_name, properties, timeout):
 
         return dbus_func
 
-    def build_property_setter(name, signature):
+    def build_property_setter(
+        name: str, signature
+    ) -> Callable[[ProxyObject, Any], None]:
         """
         Build a single property setter for this class.
 
@@ -101,7 +108,7 @@ def prop_builder(interface_name, properties, timeout):
                 fmt_str % (signature, name, interface_name)
             ) from err
 
-        def dbus_func(proxy_object, value):
+        def dbus_func(proxy_object: ProxyObject, value: Any) -> None:
             """
             The property setter.
 
@@ -120,7 +127,7 @@ def prop_builder(interface_name, properties, timeout):
                 ) from err
 
             try:  # pragma: no cover
-                return proxy_object.Set(
+                proxy_object.Set(
                     interface_name,
                     name,
                     arg,
@@ -138,7 +145,9 @@ def prop_builder(interface_name, properties, timeout):
 
         return dbus_func
 
-    def build_property(access, name, signature):
+    def build_property(
+        access: str, name: str, signature: str
+    ) -> Callable[[MutableMapping[str, Callable]], None]:
         """
         Select among getter, setter, or both methods for a given property.
 
@@ -151,7 +160,7 @@ def prop_builder(interface_name, properties, timeout):
         if access == "read":
             getter = build_property_getter(name)
 
-            def prop_method_builder(namespace):
+            def prop_method_builder(namespace: MutableMapping[str, Callable]) -> None:
                 """
                 Attaches getter to namespace.
                 """
@@ -160,7 +169,7 @@ def prop_builder(interface_name, properties, timeout):
         elif access == "write":  # pragma: no cover
             setter = build_property_setter(name, signature)
 
-            def prop_method_builder(namespace):
+            def prop_method_builder(namespace: MutableMapping[str, Callable]) -> None:
                 """
                 Attaches setter to namespace
                 """
@@ -170,7 +179,7 @@ def prop_builder(interface_name, properties, timeout):
             getter = build_property_getter(name)
             setter = build_property_setter(name, signature)
 
-            def prop_method_builder(namespace):
+            def prop_method_builder(namespace: MutableMapping[str, Callable]) -> None:
                 """
                 Attaches getter and setter to namespace
                 """
@@ -179,7 +188,7 @@ def prop_builder(interface_name, properties, timeout):
 
         return prop_method_builder
 
-    def builder(namespace):
+    def builder(namespace: MutableMapping[str, Type]) -> None:
         """
         Fills the namespace of the parent class with class members that are
         classes. Each class member has the name of a property, and each
@@ -233,7 +242,9 @@ def prop_builder(interface_name, properties, timeout):
     return builder
 
 
-def method_builder(interface_name, methods, timeout):
+def method_builder(
+    interface_name: str, methods: Sequence[ET.Element], timeout: int
+) -> Callable[[MutableMapping[str, Callable]], None]:
     """
     Returns a function that builds a method interface based on 'spec'.
 
@@ -256,7 +267,10 @@ def method_builder(interface_name, methods, timeout):
     :raises DPClientGenerationError:
     """
 
-    def build_method(name, inargs):
+    def build_method(
+        name: str,
+        inargs: Sequence[ET.Element],
+    ) -> Callable[[ProxyObject, Mapping[str, Any]], Any]:
         """
         Build a method for this class.
 
@@ -295,7 +309,7 @@ def method_builder(interface_name, methods, timeout):
             ) from err
         arg_names_set = frozenset(arg_names)
 
-        def dbus_func(proxy_object, func_args):
+        def dbus_func(proxy_object: ProxyObject, func_args: Mapping[str, Any]) -> Any:
             """
             The method proper.
 
@@ -356,7 +370,7 @@ def method_builder(interface_name, methods, timeout):
 
         return dbus_func
 
-    def builder(namespace):
+    def builder(namespace: MutableMapping[str, Callable]) -> None:
         """
         Fills the namespace of the parent class with class members that are
         methods. Each method takes a proxy object and a set of keyword
@@ -395,7 +409,7 @@ def method_builder(interface_name, methods, timeout):
     return builder
 
 
-def make_class(name, spec, timeout=-1):
+def make_class(name: str, spec: ET.Element, timeout: int = -1) -> Type:
     """
     Make a class, name, from the given spec.
     The class defines static properties and methods according to the spec.
@@ -418,7 +432,7 @@ def make_class(name, spec, timeout=-1):
     )
     prop_builder_arg = prop_builder(interface_name, spec.findall("./property"), timeout)
 
-    def builder(namespace):
+    def builder(namespace: MutableMapping[str, Type]) -> None:
         """
         Fills the namespace of the parent class with two class members,
         Properties and Methods. Both of these are classes which themselves
