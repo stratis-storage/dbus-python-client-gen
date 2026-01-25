@@ -28,7 +28,7 @@ from ._errors import (
 
 
 def prop_builder(
-    interface_name: str, properties: Sequence[ET.Element], timeout: int
+    interface_name: str, properties: Sequence[ET.Element], default_timeout: int
 ) -> Callable[[MutableMapping[str, Type]], None]:
     """
     Returns a function that builds a property interface based on arguments.
@@ -51,7 +51,7 @@ def prop_builder(
     :param str interface_name: the interface to which these properties belong
     :param properties: iterable of interface specifications for each property
     :type properties: iterable of xml.element.ElementTree.Element
-    :param int timeout: the dbus method timeout, -1 is the libdbus default ~25s.
+    :param int defaul_timeout: the D-Bus timeout, -1 is the libdbus default ~25s
 
     :raises DPClientGenerationError:
     """
@@ -63,7 +63,9 @@ def prop_builder(
         :param str name: the name of the property
         """
 
-        def dbus_func(proxy_object: ProxyObject) -> Any:
+        def dbus_func(
+            proxy_object: ProxyObject, *, timeout: int = default_timeout
+        ) -> Any:
             """
             The property getter.
 
@@ -108,7 +110,9 @@ def prop_builder(
                 fmt_str % (signature, name, interface_name)
             ) from err
 
-        def dbus_func(proxy_object: ProxyObject, value: Any) -> None:
+        def dbus_func(
+            proxy_object: ProxyObject, value: Any, *, timeout: int = default_timeout
+        ) -> None:
             """
             The property setter.
 
@@ -243,7 +247,7 @@ def prop_builder(
 
 
 def method_builder(
-    interface_name: str, methods: Sequence[ET.Element], timeout: int
+    interface_name: str, methods: Sequence[ET.Element], default_timeout: int
 ) -> Callable[[MutableMapping[str, Callable]], None]:
     """
     Returns a function that builds a method interface based on 'spec'.
@@ -262,7 +266,7 @@ def method_builder(
     :param str interface_name: name the interface to which the methods belong
     :param methods: the iterable of interface specification for each method
     :type methods: iterator of xml.element.ElementTree.Element
-    :param int timeout: the dbus method timeout, -1 is the libdbus default ~25s.
+    :param int default_timeout: D-Bus timeout, -1 is the libdbus default ~25s.
 
     :raises DPClientGenerationError:
     """
@@ -309,7 +313,12 @@ def method_builder(
             ) from err
         arg_names_set = frozenset(arg_names)
 
-        def dbus_func(proxy_object: ProxyObject, func_args: Mapping[str, Any]) -> Any:
+        def dbus_func(
+            proxy_object: ProxyObject,
+            func_args: Mapping[str, Any],
+            *,
+            timeout=default_timeout,
+        ) -> Any:
             """
             The method proper.
 
@@ -417,7 +426,7 @@ def make_class(name: str, spec: ET.Element, timeout: int = -1) -> Type:
     :param str name: the name of the class.
     :param spec: the interface specification
     :type spec: xml.element.ElementTree.Element
-    :param int timeout: dbus timeout for method(s), -1 is libdbus default ~25s.
+    :param int timeout: D-Bus timeout, -1 is libdbus default ~25s
     :returns: the constructed class
     :rtype: type
     """
