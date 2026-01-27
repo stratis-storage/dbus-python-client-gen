@@ -1,0 +1,37 @@
+---
+
+# yamllint disable rule:line-length
+upstream_project_url: https://github.com/stratis-storage/dbus-python-client-gen
+
+specfile_path: ../distro/python-dbus-python-client-gen.spec
+merge_pr_in_ci: false
+downstream_package_name: python-dbus-python-client-gen
+
+actions:
+  post-upstream-clone:
+    - "mkdir ../distro"
+    - "bash -c '(cd ../distro; wget https://src.fedoraproject.org/rpms/python-dbus-python-client-gen/raw/rawhide/f/python-dbus-python-client-gen.spec)'"
+  get-current-version:
+    - "python3 setup.py --version"
+
+srpm_build_deps:
+  - wget2
+  - wget2-wget
+
+jobs:
+  - job: copr_build
+    trigger: pull_request
+    identifier: copr_pull
+    targets:
+      - fedora-all
+
+  - job: copr_build
+    trigger: commit
+    identifier: copr_commit
+    preserve_project: true
+    targets:
+      - fedora-all
+
+notifications:
+  pull_request:
+    successful_build: true
