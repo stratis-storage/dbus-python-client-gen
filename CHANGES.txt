@@ -2,10 +2,14 @@ dbus-python-client-gen 0.8.4
 ============================
 Recommended development environment: Fedora 42
 
+- Allow passing timeout value to a generated D-Bus function:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/119
+
 - Remove license classifier deprecated by PEP 639:
   https://github.com/stratis-storage/dbus-python-client-gen/pull/112
 
 - Tidies and Maintenance:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/120
   https://github.com/stratis-storage/dbus-python-client-gen/pull/118
   https://github.com/stratis-storage/dbus-python-client-gen/pull/117
   https://github.com/stratis-storage/dbus-python-client-gen/pull/116
