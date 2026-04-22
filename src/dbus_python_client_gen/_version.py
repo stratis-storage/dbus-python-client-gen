@@ -3,9 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 """
-    Version information.
+Version information.
 
-    .. moduleauthor::  mulhern  <amulhern@redhat.com>
+.. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
 __version__ = "0.8.4"
