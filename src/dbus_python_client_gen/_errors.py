@@ -5,16 +5,9 @@
 Exception hierarchy for this package.
 """
 
-# isort: STDLIB
 from abc import ABC
 
-# Put this pylint directive at module level. There's a slight bug in pylint
-# that causes the directive to be ignored if there is no body to a class
-# (because the pass statement is omitted). On the other hand, pylint now
-# warns if it finds an unnecessary pass statement. This is the easiest course.
 
-
-# pylint: disable=too-few-public-methods
 class DPClientInvocationContext(ABC):
     """
     Identifies the context in which an invocation error occurred.
@@ -130,13 +123,7 @@ class DPClientMarshallingError(DPClientInvalidArgError):
     Exception raised when the arguments could not be marshalled properly.
     """
 
-    def __init__(
-        self,
-        message,
-        interface_name,
-        signature,
-        arguments,
-    ):
+    def __init__(self, message, interface_name, signature, arguments):
         """
         Initialize a DPClientMarshallingError with the arguments that failed.
         All DPClientMarshallingErrors are guaranteed to have a non-empty list
@@ -157,14 +144,7 @@ class DPClientKeywordError(DPClientInvalidArgError):
     Exception raised when keywords used do not match keywords expected.
     """
 
-    def __init__(
-        self,
-        message,
-        interface_name,
-        method_name,
-        expected,
-        actual,
-    ):  # pylint: disable=too-many-arguments, too-many-positional-arguments
+    def __init__(self, message, interface_name, method_name, expected, actual):
         """
         Initialize a DPClientKeywordError with the mismatched arguments.
 

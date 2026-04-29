@@ -2,20 +2,16 @@
 Test generation of class for invoking dbus methods.
 """
 
-# isort: STDLIB
 import unittest
 import xml.etree.ElementTree as ET
 
-# isort: FIRSTPARTY
-from tests._introspect import SPECS
-
-# isort: LOCAL
 from dbus_python_client_gen import (
     DPClientGenerationError,
     DPClientKeywordError,
     DPClientMarshallingError,
     make_class,
 )
+from tests._introspect import SPECS
 
 try:
     interfaces = list(SPECS)
