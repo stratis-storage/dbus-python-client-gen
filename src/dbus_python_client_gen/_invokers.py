@@ -4,16 +4,13 @@
 """
 Code for generating classes suitable for invoking dbus-python methods.
 """
-# isort: STDLIB
+
 import types
 import xml.etree.ElementTree as ET  # nosec B405
 from typing import Any, Callable, Mapping, MutableMapping, Sequence, Type
 
-# isort: THIRDPARTY
 import dbus
 from dbus.proxies import ProxyObject
-
-# isort: FIRSTPARTY
 from into_dbus_python import IntoDPError, xformer, xformers
 
 from ._errors import (
@@ -27,7 +24,7 @@ from ._errors import (
 )
 
 
-def prop_builder(
+def prop_builder(  # noqa: PLR0915
     interface_name: str, properties: Sequence[ET.Element], default_timeout: int
 ) -> Callable[[MutableMapping[str, Type]], None]:
     """
@@ -217,8 +214,7 @@ def prop_builder(
                 name = prop.attrib["name"]
             except KeyError as err:  # pragma: no cover
                 fmt_str = (
-                    "No name attribute found for property belonging to "
-                    'interface "%s"'
+                    'No name attribute found for property belonging to interface "%s"'
                 )
                 raise DPClientGenerationError(fmt_str % interface_name) from err
 
@@ -272,8 +268,7 @@ def method_builder(
     """
 
     def build_method(
-        name: str,
-        inargs: Sequence[ET.Element],
+        name: str, inargs: Sequence[ET.Element]
     ) -> Callable[[ProxyObject, Mapping[str, Any]], Any]:
         """
         Build a method for this class.
