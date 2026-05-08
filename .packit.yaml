@@ -1,6 +1,5 @@
 ---
 
-# yamllint disable rule:line-length
 upstream_project_url: https://github.com/stratis-storage/dbus-python-client-gen
 
 specfile_path: ../distro/python-dbus-python-client-gen.spec
