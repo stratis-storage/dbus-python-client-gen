@@ -48,7 +48,7 @@ def prop_builder(  # noqa: PLR0915
     :param str interface_name: the interface to which these properties belong
     :param properties: iterable of interface specifications for each property
     :type properties: iterable of xml.element.ElementTree.Element
-    :param int defaul_timeout: the D-Bus timeout, -1 is the libdbus default ~25s
+    :param int default_timeout: the D-Bus timeout, -1 is the libdbus default ~25s
 
     :raises DPClientGenerationError:
     """
