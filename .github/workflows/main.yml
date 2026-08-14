@@ -17,8 +17,6 @@ jobs:
         include:
           - dependencies: ruff
             task: make -f Makefile fmt-travis
-          - dependencies: yamllint
-            task: make -f Makefile yamllint
           - dependencies: >
               libatomic
               python3-into-dbus-python
@@ -82,3 +80,8 @@ jobs:
           ${{ matrix.dependencies }}
       - name: ${{ matrix.task }}
         run: ${{ matrix.task }}
+
+  general_checks:
+    uses: stratis-storage/github-actions/.github/workflows/reusable_general.yml@master
+    with:
+      fedora-container-image-number: 43  # CURRENT DEVELOPMENT ENVIRONMENT
