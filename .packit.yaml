@@ -10,8 +10,6 @@ actions:
   post-upstream-clone:
     - "mkdir ../distro"
     - "bash -c '(cd ../distro; wget https://src.fedoraproject.org/rpms/python-dbus-python-client-gen/raw/rawhide/f/python-dbus-python-client-gen.spec)'"
-  get-current-version:
-    - "python3 setup.py --version"
 
 srpm_build_deps:
   - wget2
