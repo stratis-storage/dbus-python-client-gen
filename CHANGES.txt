@@ -1,3 +1,21 @@
+dbus-python-client-gen 0.8.5
+============================
+Recommended development environment: Fedora 44
+
+- Use exclusively pyproject.toml for packaging metadata:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/130
+
+- Tidies and Maintenance:
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/129
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/128
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/127
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/126
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/125
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/124
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/123
+  https://github.com/stratis-storage/dbus-python-client-gen/pull/122
+
+
 dbus-python-client-gen 0.8.4
 ============================
 Recommended development environment: Fedora 42
