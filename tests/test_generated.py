@@ -51,7 +51,7 @@ class TestCase(unittest.TestCase):
             self.assertTrue(hasattr(prop_klass, "Get"))
 
             with self.assertRaises(AttributeError):
-                getattr(prop_klass, "Get")(None)
+                prop_klass.Get(None)
 
         if "write" in access:
             self.assertTrue(hasattr(prop_klass, "Set"))
@@ -63,14 +63,14 @@ class TestCase(unittest.TestCase):
                 pass
             else:
                 with self.assertRaises(DPClientMarshallingError):
-                    getattr(prop_klass, "Set")(None, None)
+                    prop_klass.Set(None, None)
 
         if "readwrite" in access:
             self.assertTrue(hasattr(prop_klass, "Get"))
             self.assertTrue(hasattr(prop_klass, "Set"))
 
             with self.assertRaises(AttributeError):
-                getattr(prop_klass, "Get")(None)
+                prop_klass.Get(None)
 
     def _test_method(self, klass, method):
         """
@@ -95,8 +95,8 @@ class TestCase(unittest.TestCase):
             self.assertTrue(hasattr(klass, "Properties"))
             self.assertTrue(hasattr(klass, "Methods"))
 
-            properties = getattr(klass, "Properties")
-            methods = getattr(klass, "Methods")
+            properties = klass.Properties
+            methods = klass.Methods
 
             for method in spec.findall("./method"):
                 self._test_method(methods, method)
