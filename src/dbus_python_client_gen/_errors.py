@@ -5,10 +5,8 @@
 Exception hierarchy for this package.
 """
 
-from abc import ABC
 
-
-class DPClientInvocationContext(ABC):
+class DPClientInvocationContext:
     """
     Identifies the context in which an invocation error occurred.
 
