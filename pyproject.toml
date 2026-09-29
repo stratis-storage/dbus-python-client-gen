@@ -1,6 +1,45 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "dbus-python-client-gen"
+authors = [{name = "Anne Mulhern", email = "amulhern@redhat.com"}]
+description = "transforms values into properly wrapped dbus-python objects"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.12"
+license = "MPL-2.0"
+dependencies = [
+    "dbus-python",
+    "into-dbus-python>=0.8",
+]
+dynamic = ["version"]
+
+[project.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[project.urls]
+Homepage = "https://github.com/stratis-storage/dbus-python-client-gen"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["dbus_python_client_gen"]
+platforms = ["Linux"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "dbus_python_client_gen._version.__version__"}
 
 [tool.ruff]
 target-version = "py312"
