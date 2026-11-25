@@ -5,6 +5,8 @@
 Exception hierarchy for this package.
 """
 
+from typing import Any
+
 
 class DPClientInvocationContext:
     """
@@ -21,7 +23,9 @@ class DPClientMethodCallContext(DPClientInvocationContext):
     Distinguishes a method call.
     """
 
-    def __init__(self, method_name, method_args):  # pragma: no cover
+    def __init__(
+        self, method_name: str, method_args: list[Any]
+    ) -> None:  # pragma: no cover
         """
         Constructs method call information.
 
@@ -38,7 +42,7 @@ class DPClientGetPropertyContext(DPClientInvocationContext):
     Get call on a property.
     """
 
-    def __init__(self, property_name):  # pragma: no cover
+    def __init__(self, property_name: str) -> None:  # pragma: no cover
         """
         Construct property information.
 
@@ -52,7 +56,7 @@ class DPClientSetPropertyContext(DPClientInvocationContext):
     Set call on a property.
     """
 
-    def __init__(self, property_name, value):  # pragma: no cover
+    def __init__(self, property_name: str, value: Any) -> None:  # pragma: no cover
         """
         Construct property and value information.
 
@@ -80,7 +84,7 @@ class DPClientRuntimeError(DPClientError):
     Exception raised during execution of generated classes.
     """
 
-    def __init__(self, message, interface_name):
+    def __init__(self, message: str, interface_name: str) -> None:
         """
         Initialize a DPClientRuntimeError with an interface name.
         All DPClientRuntimeErrors are guaranteed to have an interface name;
@@ -98,7 +102,9 @@ class DPClientInvocationError(DPClientRuntimeError):
     Exception raised when dbus-python method call fails.
     """
 
-    def __init__(self, message, interface_name, context):  # pragma: no cover
+    def __init__(
+        self, message: str, interface_name: str, context: DPClientInvocationContext
+    ) -> None:  # pragma: no cover
         """
         Initialize DPClientInvocationError
 
@@ -121,7 +127,9 @@ class DPClientMarshallingError(DPClientInvalidArgError):
     Exception raised when the arguments could not be marshalled properly.
     """
 
-    def __init__(self, message, interface_name, signature, arguments):
+    def __init__(
+        self, message: str, interface_name: str, signature: str, arguments: list[Any]
+    ) -> None:
         """
         Initialize a DPClientMarshallingError with the arguments that failed.
         All DPClientMarshallingErrors are guaranteed to have a non-empty list
@@ -142,7 +150,14 @@ class DPClientKeywordError(DPClientInvalidArgError):
     Exception raised when keywords used do not match keywords expected.
     """
 
-    def __init__(self, message, interface_name, method_name, expected, actual):
+    def __init__(
+        self,
+        message: str,
+        interface_name: str,
+        method_name: str,
+        expected: list[str],
+        actual: list[str],
+    ) -> None:
         """
         Initialize a DPClientKeywordError with the mismatched arguments.
 

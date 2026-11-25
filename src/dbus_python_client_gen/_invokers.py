@@ -87,7 +87,7 @@ def prop_builder(  # noqa: PLR0915
         return dbus_func
 
     def build_property_setter(
-        name: str, signature
+        name: str, signature: str
     ) -> Callable[[ProxyObject, Any], None]:
         """
         Build a single property setter for this class.
@@ -312,7 +312,7 @@ def method_builder(
             proxy_object: ProxyObject,
             func_args: Mapping[str, Any],
             *,
-            timeout=default_timeout,
+            timeout: int = default_timeout,
         ) -> Any:
             """
             The method proper.
@@ -328,7 +328,7 @@ def method_builder(
                     f"Argument keywords passed ({', '.join(arg_list)}) did not match "
                     f"argument keywords expected ({', '.join(param_list)}) "
                     f'for method "{name}" '
-                    f'belonging to interface "{interface_name}"',
+                    f'belonging to interface "{interface_name}"'
                 )
                 raise DPClientKeywordError(
                     err_msg, interface_name, name, arg_list, param_list

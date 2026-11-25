@@ -14,11 +14,11 @@ from dbus_python_client_gen import (
 from tests._introspect import SPECS
 
 try:
-    interfaces = list(SPECS)
+    interfaces: list[str] = list(SPECS)
 
-    TIMEOUT = 120000
+    TIMEOUT: int = 120000
 
-    klasses = {}
+    klasses: dict[str, tuple[ET.Element, type]] = {}
     for key, value in SPECS.items():
         xml_spec = ET.fromstring(value)
         klass_def = make_class(key.split(".")[-2], xml_spec, TIMEOUT)
@@ -35,7 +35,7 @@ class TestCase(unittest.TestCase):
     Test the behavior of various auto-generated classes
     """
 
-    def _test_property(self, klass, prop):
+    def _test_property(self, klass: type, prop: ET.Element) -> None:
         """
         Test a single property.
 
@@ -72,7 +72,7 @@ class TestCase(unittest.TestCase):
             with self.assertRaises(AttributeError):
                 prop_klass.Get(None)
 
-    def _test_method(self, klass, method):
+    def _test_method(self, klass: type, method: ET.Element) -> None:
         """
         Test a single method.
 
@@ -83,11 +83,11 @@ class TestCase(unittest.TestCase):
         name = method.attrib["name"]
         self.assertTrue(hasattr(klass, name))
 
-        method = getattr(klass, name)
+        method_func = getattr(klass, name)
         with self.assertRaises(DPClientKeywordError):
-            method(None, {"bogus_keyword": None})
+            method_func(None, {"bogus_keyword": None})
 
-    def _test_klasses(self):
+    def _test_klasses(self) -> None:
         """
         Test the standard classes specified.
         """
@@ -104,7 +104,7 @@ class TestCase(unittest.TestCase):
             for prop in spec.findall("./property"):
                 self._test_property(properties, prop)
 
-    def test_specs(self):
+    def test_specs(self) -> None:
         """
         Test properties and methods of all specs available.
         """
