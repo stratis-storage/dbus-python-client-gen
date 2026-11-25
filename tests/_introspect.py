@@ -1,4 +1,4 @@
-SPECS = {
+SPECS: dict[str, str] = {
     "org.freedesktop.DBus.ObjectManager": """
 <interface name="org.freedesktop.DBus.ObjectManager">
     <method name="GetManagedObjects">
