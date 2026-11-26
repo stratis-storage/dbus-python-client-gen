@@ -322,8 +322,8 @@ def method_builder(
             :raises DPClientRuntimeError:
             """
             if arg_names_set != frozenset(func_args.keys()):
-                param_list = list(arg_names_set)
-                arg_list = list(func_args.keys())
+                param_list = sorted(list(arg_names_set))
+                arg_list = sorted(list(func_args.keys()))
                 err_msg = (
                     f"Argument keywords passed ({', '.join(arg_list)}) did not match "
                     f"argument keywords expected ({', '.join(param_list)}) "
